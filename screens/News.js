@@ -3,6 +3,8 @@ import React from 'react'
 import AdmissionForm from './AdmissionForm'
 import StudentRegistration from './StudentRegistration'
 import ExamScreen from './ExamScreen'
+import EducationForm from './EducationForm'
+import Education from './Education'
 
 
 
@@ -10,7 +12,7 @@ import ExamScreen from './ExamScreen'
 const News = () => {
   return (
     <View>
-      <ExamScreen/>
+      <Education/>
     </View>
   )
 }

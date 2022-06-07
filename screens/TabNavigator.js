@@ -13,9 +13,13 @@ import AdmissionForm from './AdmissionForm';
 
 
 
+
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import AdminCard from './AdminCard';
 import { color } from '../components/Colors';
+import Education from './Education';
+import ExamScreen from './ExamScreen';
 
 
 const tabs = createBottomTabNavigator();
@@ -64,11 +68,14 @@ const TabNavigator = () => {
             }else if(route.name === 'admitcard'){
               iconName = focused ? 'book' : 'book-outline';
               setColor = focused ? '#2A9381' : '#eee';
+            }else if(route.name === 'DemoExam'){
+              iconName = focused ? 'book' : 'book';
+              setColor = focused ? '#6c757d' : '#6c757d';
             }
             return <Icon name={iconName} size={30} color={setColor} />;
           },
           headerShown: false,
-          tabBarActiveTintColor: '#7de06b',
+          tabBarActiveTintColor: '#2A9381',
         })}>
         <tabs.Screen name="home" component={Home} />
         {/* <tabs.Screen name="news" component={News} /> */}
@@ -76,7 +83,9 @@ const TabNavigator = () => {
         {/* <tabs.Screen name="Registration" component={Howtoapply} /> */}
         {/* <tabs.Screen name="education" component={EducationForm} /> */}
         {/* <tabs.Screen name="admission" component={AdmissionForm} /> */}
-        {/* <tabs.Screen name="experrience" component={ExperienceForm} /> */}
+        {/* <tabs.Screen name="experrience" component={Education} /> */}
+        <tabs.Screen name="DemoExam" component={ExamScreen} />
+
 
       </tabs.Navigator>
     </>

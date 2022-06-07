@@ -7,8 +7,15 @@ import {
   Pressable,
   Alert,
   TouchableOpacity,
+  SafeAreaView,
 } from 'react-native';
-import React, {useDebugValue, useEffect, useState} from 'react';
+import React, {
+  useDebugValue,
+  useEffect,
+  useState,
+  useRef,
+  useCallback,
+} from 'react';
 import {
   List,
   TextInput,
@@ -32,7 +39,8 @@ import {StackActions, useNavigation} from '@react-navigation/native';
 import {useDispatch} from 'react-redux';
 import RNPickerSelect from 'react-native-picker-select';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
-
+import Recaptcha from 'react-native-recaptcha-that-works';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const StudentRegistration = () => {
   const navigate = useNavigation();
@@ -45,7 +53,17 @@ const StudentRegistration = () => {
   const [token, setToken] = useState(null);
   const [imgplaceholder, setImgplaceholder] = useState('Add Image');
   const [isloading, setIsLoading] = useState(true);
- 
+  const [isImg, setIsImg] = useState(false);
+  const [validateImg, setValidateImg] = useState(false);
+
+  const size = 'normal';
+  const $recaptcha = useRef();
+  const handleOpenPress = useCallback(() => {
+    $recaptcha.current.open();
+  }, []);
+  const handleClosePress = useCallback(() => {
+    $recaptcha.current.close();
+  }, []);
 
   useEffect(() => {
     //GET USER ID FROM ASYNC STORAGE
@@ -65,9 +83,7 @@ const StudentRegistration = () => {
               .then(res => {
                 // console.log(res.data);
                 console.log(res.data + 'IM FROM STUDENT REGISTRATION');
-                navigate.dispatch(
-                  StackActions.replace('TabNavigator')
-                )
+                navigate.dispatch(StackActions.replace('edu'));
               })
               .catch(err => {
                 console.log(err + 'ERR');
@@ -75,7 +91,6 @@ const StudentRegistration = () => {
               });
           };
           getStudent();
-
 
           const getCity = async () => {
             await axios
@@ -98,7 +113,6 @@ const StudentRegistration = () => {
     };
     getToken();
   }, []);
-
 
   const ImageHandle = () => {
     const options = {
@@ -127,23 +141,26 @@ const StudentRegistration = () => {
         setImgplaceholder('Image Added');
         setImage(base64);
         setExt(typeSplit[1]);
+        setIsImg(true);
+        setValidateImg(false);
       }
     });
   };
 
-
-  const handleArea = (value) => {
-    console.log(value + "ID");
-    axios.get(`${BASE_URL}/Area/GetByCityId?id=${value}`).then((res)=>{
-      setDistrict(res.data);
-      // console.log(res.data);
-
-
-    }).catch((err)=>{
-      console.log(err + "FROM CITY POST")
-    })
-  }
-
+  const handleArea = value => {
+    console.log(value + 'ID');
+    axios
+      .get(`${BASE_URL}/Area/GetByCityId?id=${value}`, {
+        headers: {Authorization: `Bearer ${token}`},
+      })
+      .then(res => {
+        setDistrict(res.data);
+        // console.log(res.data);
+      })
+      .catch(err => {
+        console.log(err + 'FROM CITY POST');
+      });
+  };
 
   //modify designation array with custom key
   const areaarr = district.map((item, index) => {
@@ -152,8 +169,6 @@ const StudentRegistration = () => {
       value: item.id,
     };
   });
-
- 
 
   const cityarr = city.map((item, index) => {
     return {
@@ -176,33 +191,34 @@ const StudentRegistration = () => {
       .required('Required'),
     gender: Yup.string().required('Required'),
     cnic: Yup.string()
-      .min(13, 'Too Short!')
-      .max(13, 'Too Long!')
+      .matches(
+        /^[0-9]{5}-[0-9]{7}-[0-9]{1}$/,
+        'Invalid CNIC example: 12345-1234567-1',
+      )
       .required('Required'),
-  
-    dob: Yup.string()
-      .required('Required'),
-    FatherOccupation: Yup.string()
-      .required('Required'),
-    presentAddress: Yup.string()
-    .required('Required'),
-    cityId: Yup.string()
-    .required('Required'),
-    whatsappNumber: Yup.string()
-    .required('Required'),
-    otherNumber: Yup.string().required('Required'),
+
+    dob: Yup.string().required('Required'),
+    FatherOccupation: Yup.string().required('Required'),
+    presentAddress: Yup.string().required('Required'),
+    cityId: Yup.string().required('Required'),
+    whatsappNumber: Yup.string().required('Required'),
+    // otherNumber: Yup.string().required('Required'),
     areaId: Yup.string().required('Required'),
-    facebookAccount: Yup.string().required('Required'),
-    linkedinAccount: Yup.string().required('Required'),
-    instagramAccount: Yup.string().required('Required'),
-    email: Yup.string().required('Required'),
+    // facebookAccount: Yup.string().required('Required'),
+    // linkedinAccount: Yup.string().required('Required'),
+    // instagramAccount: Yup.string().required('Required'),
+    // email: Yup.string().required('Required'),
   });
 
-  const skipHandle = () =>{
-    navigate.navigate('Course');
+  // const skipHandle = () =>{
+  //   navigate.navigate('edu');
+  // }
+
+
+
+  const a = () => {
+    handleOpenPress();
   }
-
-
 
   return (
     <>
@@ -226,18 +242,18 @@ const StudentRegistration = () => {
               presentAddress: '',
               cityId: '',
               whatsappNumber: '',
-              otherNumber: '',
+              // otherNumber: '',
               areaId: '',
               facebookAccount: '',
-              linkedinAccount: '',
-              instagramAccount: '',
+              // linkedinAccount: '',
+              // instagramAccount: '',
               email: '',
             }}
             validationSchema={validation}
             onSubmit={async (values, {resetForm}) => {
               console.log({
                 fatherName: values.fatherName,
-                otherNumber: values.otherNumber,
+                // otherNumber: values.otherNumber,
                 gender: values.gender,
                 dob: values.dob,
                 cnic: values.cnic,
@@ -248,8 +264,8 @@ const StudentRegistration = () => {
                 enrollmentDate: today,
                 cityId: values.cityId,
                 facebookAccount: values.facebookAccount,
-                linkedinAccount: values.linkedinAccount,
-                instagramAccount: values.instagramAccount,
+                linkedinAccount: null,
+                instagramAccount: null,
                 whatsappNumber: values.whatsappNumber,
               });
 
@@ -258,7 +274,7 @@ const StudentRegistration = () => {
                   `${BASE_URL}/Student/Add`,
                   {
                     fatherName: values.fatherName,
-                    otherNumber: values.otherNumber,
+                    otherNumber: null,
                     gender: values.gender,
                     dob: values.dob,
                     cnic: values.cnic,
@@ -281,21 +297,26 @@ const StudentRegistration = () => {
                   },
                 )
                 .then(res => {
-                  console.log('DATA POSTED');
-                  navigate.navigate('Course');
-                  axios.post(
-                    `${BASE_URL}/Student/AddImage`,
-                    {
-                      image: image,
-                      ext: ext,
-                    },
-                    {
-                      headers: {
-                        Authorization: `Bearer ${token}`,
+                  if(isImg){
+                    console.log('DATA POSTED');
+                    navigate.navigate('edu');
+                    axios.post(
+                      `${BASE_URL}/Student/AddImage`,
+                      {
+                        image: image,
+                        ext: ext,
                       },
-                    },
-                  );
-                  resetForm();
+                      {
+                        headers: {
+                          Authorization: `Bearer ${token}`,
+                        },
+                      },
+                    );
+                    resetForm();
+                  }else{
+                    console.log("ADD IMAGE FIRST");
+                    setValidateImg(true);
+                  }
                 })
                 .catch(err => {
                   console.log(err.response);
@@ -327,6 +348,7 @@ const StudentRegistration = () => {
                       onChangeText={handleChange('fatherName')}
                       value={values.fatherName}
                       onBlur={handleBlur('fatherName')}
+                      activeUnderlineColor={color.primary}
                     />
                     <HelperText
                       type="error"
@@ -335,7 +357,7 @@ const StudentRegistration = () => {
                       {touched.fatherName && errors.fatherName}
                     </HelperText>
 
-                    <TextInput
+                    {/* <TextInput
                       style={{marginHorizontal: 20, marginVertical: 10}}
                       mode="flat"
                       placeholder="Second Number"
@@ -343,13 +365,14 @@ const StudentRegistration = () => {
                       onChangeText={handleChange('otherNumber')}
                       value={values.otherNumber}
                       onBlur={handleBlur('otherNumber')}
+                      activeUnderlineColor={color.primary}
                     />
                     <HelperText
                       type="error"
                       style={{marginHorizontal: 20}}
                       visible={touched.otherNumber && errors.otherNumber}>
                       {touched.otherNumber && errors.otherNumber}
-                    </HelperText>
+                    </HelperText> */}
                     <TextInput
                       style={{marginHorizontal: 20, marginVertical: 10}}
                       mode="flat"
@@ -358,6 +381,7 @@ const StudentRegistration = () => {
                       onChangeText={handleChange('whatsappNumber')}
                       value={values.whatsappNumber}
                       onBlur={handleBlur('whatsappNumber')}
+                      activeUnderlineColor={color.primary}
                     />
                     <HelperText
                       type="error"
@@ -374,6 +398,7 @@ const StudentRegistration = () => {
                       onChangeText={handleChange('email')}
                       value={values.email}
                       onBlur={handleBlur('email')}
+                      activeUnderlineColor={color.primary}
                     />
                     <HelperText
                       type="error"
@@ -398,6 +423,12 @@ const StudentRegistration = () => {
                         value="Female"
                       />
                     </RadioButton.Group>
+                    <HelperText
+                      type="error"
+                      style={{marginHorizontal: 20}}
+                      visible={touched.gender && errors.gender}>
+                      {touched.gender && errors.gender}
+                    </HelperText>
 
                     <View
                       style={{
@@ -460,6 +491,8 @@ const StudentRegistration = () => {
                           justifyContent: 'center',
                           alignItems: 'center',
                           borderRadius: 4,
+                          borderColor:validateImg ? 'red' : '#eee',
+                          borderWidth: validateImg ? 2 : 0,
                         }}>
                         <Text
                           style={{
@@ -490,6 +523,12 @@ const StudentRegistration = () => {
                         items={cityarr}
                         value={values.cityId}
                       />
+                      <HelperText
+                        type="error"
+                        style={{marginHorizontal: 20}}
+                        visible={touched.cityId && errors.cityId}>
+                        {touched.cityId && errors.cityId}
+                      </HelperText>
                     </View>
 
                     <View>
@@ -512,6 +551,12 @@ const StudentRegistration = () => {
                         items={areaarr}
                         value={values.areaId}
                       />
+                      <HelperText
+                        type="error"
+                        style={{marginHorizontal: 20}}
+                        visible={touched.areaId && errors.areaId}>
+                        {touched.areaId && errors.areaId}
+                      </HelperText>
                     </View>
 
                     <TextInput
@@ -519,9 +564,16 @@ const StudentRegistration = () => {
                       mode="flat"
                       placeholder="CNIC"
                       name="cnic"
-                      onChangeText={handleChange('cnic')}
+                      onChangeText={value => {
+                        //in cnic add - automtic
+                        const cnic = value
+                          .replace(/\D/g, '')
+                          .replace(/(\d{5})(\d{7})(\d{1})/, '$1-$2-$3');
+                        setFieldValue('cnic', cnic);
+                      }}
                       value={values.cnic}
                       onBlur={handleBlur('cnic')}
+                      activeUnderlineColor={color.primary}
                     />
                     <HelperText
                       type="error"
@@ -538,6 +590,7 @@ const StudentRegistration = () => {
                       onChangeText={handleChange('FatherOccupation')}
                       value={values.FatherOccupation}
                       onBlur={handleBlur('FatherOccupation')}
+                      activeUnderlineColor={color.primary}
                     />
                     <HelperText
                       type="error"
@@ -548,8 +601,6 @@ const StudentRegistration = () => {
                       {touched.FatherOccupation && errors.FatherOccupation}
                     </HelperText>
 
-                   
-
                     <TextInput
                       style={{marginHorizontal: 20, marginVertical: 10}}
                       mode="flat"
@@ -558,6 +609,7 @@ const StudentRegistration = () => {
                       onChangeText={handleChange('presentAddress')}
                       value={values.presentAddress}
                       onBlur={handleBlur('presentAddress')}
+                      activeUnderlineColor={color.primary}
                     />
                     <HelperText
                       type="error"
@@ -566,16 +618,15 @@ const StudentRegistration = () => {
                       {touched.presentAddress && errors.presentAddress}
                     </HelperText>
 
-                   
-
                     <TextInput
-                      style={{marginHorizontal: 20, marginVertical: 10}}
+                      style={styles.input}
                       mode="flat"
                       placeholder="Facebook Account"
                       name="facebookAccount"
                       onChangeText={handleChange('facebookAccount')}
                       value={values.facebookAccount}
                       onBlur={handleBlur('facebookAccount')}
+                      activeUnderlineColor={color.primary}
                     />
                     <HelperText
                       type="error"
@@ -586,7 +637,7 @@ const StudentRegistration = () => {
                       {touched.facebookAccount && errors.facebookAccount}
                     </HelperText>
 
-                    <TextInput
+                    {/* <TextInput
                       style={{marginHorizontal: 20, marginVertical: 10}}
                       mode="flat"
                       placeholder="Instagram Account"
@@ -602,9 +653,9 @@ const StudentRegistration = () => {
                         touched.instagramAccount && errors.instagramAccount
                       }>
                       {touched.instagramAccount && errors.instagramAccount}
-                    </HelperText>
+                    </HelperText> */}
 
-                    <TextInput
+                    {/* <TextInput
                       style={{marginHorizontal: 20, marginVertical: 10}}
                       mode="flat"
                       placeholder="LinkedIn Account"
@@ -620,7 +671,7 @@ const StudentRegistration = () => {
                         touched.linkedinAccount && errors.linkedinAccount
                       }>
                       {touched.linkedinAccount && errors.linkedinAccount}
-                    </HelperText>
+                    </HelperText> */}
 
                     <View>
                       <Button
@@ -630,25 +681,82 @@ const StudentRegistration = () => {
                           marginHorizontal: 10,
                           marginVertical: 15,
                         }}
-                        onPress={handleSubmit}>
+                        onPress={handleOpenPress}>
+                          
                         Submit
                       </Button>
-                     <View style={{
+                      <View
+                        style={{
                           flexDirection: 'row',
                           justifyContent: 'center',
-                     }}>
-                     <Button
-                        mode="text"
-                        color={color.primary}
-                        style={{
-                          marginHorizontal: 10,
-                          marginVertical: 15,
-                        }}
-                        onPress={resetForm}>
-                        Clear
-                      </Button>
+                        }}>
+                        <Button
+                          mode="text"
+                          color={color.primary}
+                          style={{
+                            marginHorizontal: 10,
+                            marginVertical: 15,
+                          }}
+                          onPress={resetForm}>
+                          Clear
+                        </Button>
+                        <Recaptcha
+                          ref={$recaptcha}
+                          lang="en"
+                          headerComponent={
+                            <SafeAreaView>
+                              <View
+                                style={{
+                                  flexDirection: 'row',
+                                  justifyContent: 'flex-end',
+                                  alignItems: 'center',
+                                  paddingVertical: 10,
+                                }}>
+                                <Icon
+                                  name="close"
+                                  size={30}
+                                  style={{marginRight: 10}}
+                                  onPress={handleClosePress}
+                                />
+                              </View>
+                            </SafeAreaView>
+                          }
+                          loadingComponent={
+                            <>
+                              <ActivityIndicator color="green" />
+                              <Text style={{color: '#fff'}}>
+                                Loading reCaptcha...
+                              </Text>
+                            </>
+                          }
+                          siteKey="6LfkbEMgAAAAAIkc9Cd-pls5ZspaVywaGQfgG4Dl"
+                          baseUrl="http://127.0.0.1"
+                          size={size}
+                          theme="light"
+                          onError={err => {
+                            alert('SOMETHING WENT WRONG');
+                            // console.warn(err);
+                          }}
+                          onExpire={() => alert('TOKEN EXPIRED')}
+                          onVerify={token => {
+                            axios
+                              .post(`${BASE_URL}/Auth/Recaptcha?token=${token}`)
+                              .then(res => {
+                                if (res.data === true) {
+                                  handleSubmit();
+                                } else {
+                                  alert('Verification failed');
+                                }
+                              })
+                              .catch(err => {
+                                console.log(err);
+                              });
+                            console.log(token);
+                            handleSubmit();
+                          }}
+                        />
 
-                      <Button
+                        {/* <Button
                         mode='text'
                         color={color.primary}
                         style={{
@@ -657,8 +765,8 @@ const StudentRegistration = () => {
                         }}
                         onPress={skipHandle}>
                         Skip
-                      </Button>
-                     </View>
+                      </Button> */}
+                      </View>
                     </View>
                   </ScrollView>
                 </View>
@@ -674,6 +782,11 @@ const StudentRegistration = () => {
 export default StudentRegistration;
 
 const styles = StyleSheet.create({
+  input: {
+    marginHorizontal: 20,
+    marginVertical: 10,
+    height: 65,
+  },
   container: {
     flex: 1,
     backgroundColor: '#fff',

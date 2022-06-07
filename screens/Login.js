@@ -1,5 +1,13 @@
-import {StyleSheet, Text, View, TouchableOpacity, Image} from 'react-native';
-import React, {useState, useEffect} from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  Image,
+  SafeAreaView,
+  ActivityIndicator,
+} from 'react-native';
+import React, {useState, useEffect, useRef, useCallback} from 'react';
 import {TextInput, HelperText} from 'react-native-paper';
 import {Button} from 'react-native-paper';
 import {Formik, useFormik} from 'formik';
@@ -10,7 +18,9 @@ import {color} from '../components/Colors';
 import {BASE_URL} from '../config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useDispatch, useSelector} from 'react-redux';
-
+import Recaptcha from 'react-native-recaptcha-that-works';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+//6LfkbEMgAAAAAIkc9Cd-pls5ZspaVywaGQfgG4Dl
 const validation = Yup.object().shape({
   username: Yup.string().required('Username is required'),
   password: Yup.string().required('Password is required'),
@@ -25,6 +35,15 @@ const Login = () => {
   const loginstate = useSelector(state => state.LoginReducer.isLoggedIn);
   const [toast, setToast] = useState('');
 
+  // const size = 'normal';
+  // const $recaptcha = useRef();
+  // const handleOpenPress = useCallback(() => {
+  //   $recaptcha.current.open();
+  // }, []);
+  // const handleClosePress = useCallback(() => {
+  //   $recaptcha.current.close();
+  // }, []);
+
   return (
     <>
       <Formik
@@ -35,9 +54,15 @@ const Login = () => {
         validationSchema={validation}
         onSubmit={(values, {resetForm}) => {
           setIsLoading(true);
+          //remove spaces from values
+          const username = values.username.trim();
+          const password = values.password.trim();
 
           axios
-            .post(`${BASE_URL}/Auth/login`, values)
+            .post(`${BASE_URL}/Auth/login`, {
+              username,
+              password,
+            })
             .then(res => {
               const data = JSON.stringify(res.data);
               try {
@@ -53,13 +78,20 @@ const Login = () => {
               }
             })
             .catch(err => {
-              console.log(err.response);
-              // console.log(err.response.data);
-              setToast('Username or Password is incorrect');
+              // console.log(err.data);
+              console.log(err.response.data);
+              setToast(err.response.data);
               setIsLoading(false);
             });
         }}>
-        {({handleChange, handleBlur, handleSubmit, values, errors,touched}) => (
+        {({
+          handleChange,
+          handleBlur,
+          handleSubmit,
+          values,
+          errors,
+          touched,
+        }) => (
           <View style={styles.container}>
             <View style={styles.logo}>
               <Image
@@ -67,18 +99,16 @@ const Login = () => {
                 style={styles.img}
               />
             </View>
-            <View>
-              <Text style={{color:"red"}}>{toast}</Text>
-            </View>
+
             <View>
               <TextInput
-                
                 label="Username"
                 onChangeText={handleChange('username')}
                 value={values.name}
                 style={styles.input}
-                mode="outlined"
+                mode="flat"
                 onBlur={handleBlur('username')}
+                activeUnderlineColor={color.primary}
               />
               <HelperText
                 type="error"
@@ -90,9 +120,10 @@ const Login = () => {
                 label="Password"
                 secureTextEntry={eye}
                 value={values.password}
-                mode="outlined"
+                mode="flat"
                 onBlur={handleBlur('password')}
                 onChangeText={handleChange('password')}
+                activeUnderlineColor={color.primary}
                 right={
                   <TextInput.Icon
                     name={eye ? 'eye-off' : 'eye'}
@@ -107,6 +138,9 @@ const Login = () => {
                 visible={errors.password}>
                 {errors.password}
               </HelperText>
+              <View>
+                <Text style={{color: 'red', marginLeft: 10}}>{toast}</Text>
+              </View>
               <Button
                 loading={isloading}
                 onPress={handleSubmit}
@@ -117,8 +151,69 @@ const Login = () => {
               </Button>
             </View>
             <TouchableOpacity onPress={() => navigate.navigate('Register')}>
-              <Text>Don't Have Account?</Text>
+              <Text
+                style={{
+                  color: '#000',
+                }}>
+                Don't Have Account?
+              </Text>
             </TouchableOpacity>
+            {/* <Button mode="outlined" onPress={handleOpenPress}>
+              Verify
+            </Button> */}
+
+            {/* <Recaptcha
+              ref={$recaptcha}
+              lang="en"
+              headerComponent={
+                <SafeAreaView>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'flex-end',
+                      alignItems: 'center',
+                      paddingVertical: 10,
+                    }}>
+                    <Icon
+                      name="close"
+                      size={30}
+                      style={{marginRight: 10}}
+                      onPress={handleClosePress}
+                    />
+                  </View>
+                </SafeAreaView>
+              }
+              loadingComponent={
+                <>
+                  <ActivityIndicator color="green" />
+                  <Text style={{color: '#fff'}}>Loading reCaptcha...</Text>
+                </>
+              }
+              siteKey="6LfkbEMgAAAAAIkc9Cd-pls5ZspaVywaGQfgG4Dl"
+              baseUrl="http://127.0.0.1"
+              size={size}
+              theme="light"
+              onError={err => {
+                alert("SOMETHING WENT WRONG");
+                // console.warn(err);
+              }}
+              onExpire={() => alert('TOKEN EXPIRED')}
+              onVerify={token => {
+                axios
+                  .post(`${BASE_URL}/Auth/Recaptcha?token=${token}`)
+                  .then(res => {
+                    if(res.data === true){
+                      alert('success');
+                    }else{
+                      alert('Verification failed');
+                    }
+                  })
+                  .catch(err => {
+                    console.log(err);
+                  });
+                // console.log(token);
+              }}
+            /> */}
           </View>
         )}
       </Formik>
@@ -137,13 +232,14 @@ const styles = StyleSheet.create({
   },
   input: {
     width: 300,
-    height: 50,
+    height: 65,
     marginLeft: 10,
   },
   button: {
     width: 300,
     margin: 10,
     backgroundColor: color.primary,
+    color: '#fff',
   },
   img: {
     width: '100%',

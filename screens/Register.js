@@ -9,6 +9,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useNavigation} from '@react-navigation/native';
 import {color} from '../components/Colors';
 import {BASE_URL} from '../config';
+import {useDispatch} from 'react-redux';
 
 const validation = Yup.object().shape({
   name: Yup.string().required('Name is required'),
@@ -19,13 +20,13 @@ const validation = Yup.object().shape({
     .min(11, 'Phone number must be 11 digits')
     .max(11, 'Phone number must be 12 digits')
     .required('Phone number is required'),
-
 });
 
 const Register = () => {
   const [isloading, setIsLoading] = useState(false);
   const [eye, setEye] = useState(true);
   const navigate = useNavigation();
+  const dispatch = useDispatch();
   //img sourse
 
   return (
@@ -40,20 +41,66 @@ const Register = () => {
           </View>
           <Formik
             onSubmit={async (values, {resetForm}) => {
-              console.log(values);
+              //remove spaces from values
+              const name = values.name.trim();
+              const username = values.username.trim();
+              const password = values.password.trim();
+              const email = values.email.trim();
+               const number = email.slice(1);
+               const number1 = '+92' + number;
+
+             
+
               setIsLoading(true);
               await axios
                 .post(`${BASE_URL}/Auth/register`, {
-                  name: values.name,
-                  username: values.username,
-                  email: values.email,
-                  password: values.password,
+                  name,
+                  username,
+                  number1,
+                  password,
                   role: null,
                 })
                 .then(res => {
+                   //SMS WORK
+                  
+
+                  axios
+                  .post(
+                    `https://sms.montymobile.com/API/SendBulkSMS`,
+                    {
+                      source: 'Alkhidmat',
+                      destination: [`${number1}`],
+                      text: 'Thank you for registering with Bano Qabil.',
+                    },
+                    {
+                      headers: {
+                        Authorization: 'Basic SW5ub3ZhZG9yOkZjNGhpNWNr',
+                      },
+                    },
+                  )
+                  .then(res => {
+                    console.log('SMS RESPONSE', res);
+                  })
+                  .catch(err => {
+                    console.log(err);
+                  });
+
+                  //SMS WORK
                   setIsLoading(false);
                   console.log(res.data);
-                  navigate.navigate('Login');
+                  const data = JSON.stringify(res.data);
+                  try {
+                    AsyncStorage.setItem('@userlogininfo', data);
+                    console.log('data', data);
+                    dispatch({type: 'LOGIN'});
+                    if (loginstate) {
+                      navigate.navigate('str');
+                      
+                    }
+                    resetForm();
+                  } catch (e) {
+                    // saving error
+                  }
                 })
                 .catch(err => console.log(err.response));
               resetForm();
@@ -61,11 +108,10 @@ const Register = () => {
             initialValues={{
               name: '',
               username: '',
-              email:'',
+              email: '',
               password: '',
             }}
-            validationSchema={validation}
-            >
+            validationSchema={validation}>
             {({handleChange, handleBlur, handleSubmit, values, errors}) => (
               <>
                 <View style={styles.form}>
@@ -74,8 +120,9 @@ const Register = () => {
                     onChangeText={handleChange('name')}
                     value={values.name}
                     style={styles.input}
-                    mode="outlined"
+                    mode="flat"
                     onBlur={handleBlur('name')}
+                    activeUnderlineColor={color.primary}
                   />
                   <HelperText type="error" visible={errors.name}>
                     {errors.name}
@@ -85,8 +132,9 @@ const Register = () => {
                     label="Username"
                     value={values.username}
                     style={styles.input}
-                    mode="outlined"
+                    mode="flat"
                     onBlur={handleBlur('username')}
+                    activeUnderlineColor={color.primary}
                   />
                   <HelperText type="error" visible={errors.username}>
                     {errors.username}
@@ -97,8 +145,9 @@ const Register = () => {
                     label="Mobile Number"
                     value={values.email}
                     style={styles.input}
-                    mode="outlined"
+                    mode="flat"
                     onBlur={handleBlur('email')}
+                    activeUnderlineColor={color.primary}
                   />
                   <HelperText type="error" visible={errors.email}>
                     {errors.email}
@@ -107,9 +156,10 @@ const Register = () => {
                     label="Password"
                     secureTextEntry={eye}
                     value={values.password}
-                    mode="outlined"
+                    mode="flat"
                     onBlur={handleBlur('password')}
                     onChangeText={handleChange('password')}
+                    activeUnderlineColor={color.primary}
                     right={
                       <TextInput.Icon
                         name={eye ? 'eye-off' : 'eye'}
@@ -130,7 +180,7 @@ const Register = () => {
                     Register
                   </Button>
                   <TouchableOpacity onPress={() => navigate.navigate('Login')}>
-                    <Text style={{textAlign: 'center'}}>
+                    <Text style={{textAlign: 'center', color: '#000'}}>
                       Already Have Account?
                     </Text>
                   </TouchableOpacity>
@@ -155,8 +205,9 @@ const styles = StyleSheet.create({
   },
   input: {
     width: 300,
-    height: 50,
+    height: 65,
     marginLeft: 10,
+    padding: 0,
   },
   button: {
     width: 300,
@@ -166,15 +217,13 @@ const styles = StyleSheet.create({
   img: {
     width: '50%',
     height: '50%',
-    
   },
   logo: {
     width: 300,
     height: 200,
-    marginLeft:12,
-    justifyContent:'center',
-    alignItems:"center"
-    
+    marginLeft: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   form: {
     marginBottom: 50,

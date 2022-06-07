@@ -14,11 +14,16 @@ import {rootReducer} from './redux/Index';
 
 const store = createStore(rootReducer);
 
+const theme = {
+  ...DefaultTheme,
+  roundness: 2,
+};
+
 export default function Main() {
   return (
     <>
       <Provider store={store}>
-        <PaperProvider   >
+        <PaperProvider  theme={theme} >
           <App />
         </PaperProvider>
       </Provider>

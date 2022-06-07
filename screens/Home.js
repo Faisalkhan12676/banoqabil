@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
   BackHandler,
-  Alert
+  Alert,
 } from 'react-native';
 import React, {useEffect} from 'react';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -20,6 +20,9 @@ import {color} from '../components/Colors';
 import {useNavigation} from '@react-navigation/native';
 import Logout from '../components/Logout';
 import {useDispatch} from 'react-redux';
+import Info from 'react-native-vector-icons/MaterialIcons';
+import AdmissionForm from './AdmissionForm';
+
 
 const Home = () => {
   const navigation = useNavigation();
@@ -37,12 +40,6 @@ const Home = () => {
       });
   };
 
-  useEffect(()=>{
-    //backhandler for this component
-   
-    
-  },[])
-
   return (
     <>
       {/* HEADER */}
@@ -57,9 +54,24 @@ const Home = () => {
             style={styles.logo}
           />
         </View>
-        <TouchableOpacity onPress={handlelogout}>
-          <Logout />
-        </TouchableOpacity>
+        <View
+          style={{
+            flexDirection: 'row',
+          }}>
+          <TouchableOpacity onPress={() => navigation.navigate('details')}>
+            <Info name="person" color={color.primary} size={30} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('admitCard')}>
+            <Info name="info" color={color.primary} size={30} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{
+              marginLeft: 10,
+            }}
+            onPress={handlelogout}>
+            <Logout />
+          </TouchableOpacity>
+        </View>
       </View>
 
       <ScrollView>
@@ -67,24 +79,16 @@ const Home = () => {
         <View style={styles.container}>
           <TouchableOpacity
             activeOpacity={1}
-            onPress={() => navigation.navigate('ViewDetails')}>
+            onPress={() => navigation.navigate('courses')}>
             <View style={styles.card}>
-              <Icon name="person" size={60} style={styles.clr} />
-              <Text style={styles.clr}>Profile</Text>
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity activeOpacity={1}>
-            <View style={styles.card}>
-              <Icon name="book" size={50} style={styles.clr} />
-              <Text style={styles.clr}>Masters </Text>
-              <Text style={styles.clr}>Scholarship</Text>
+              <Paper name="bulb-outline" size={60} style={styles.clr} />
+              <Text style={styles.clr}>IT Skills</Text>
             </View>
           </TouchableOpacity>
 
           <TouchableOpacity
             activeOpacity={1}
-           >
+            onPress={() => navigation.navigate('awards')}>
             <View style={styles.card}>
               <Award name="trophy-award" size={50} style={styles.clr} />
               <Text style={styles.clr}>Nimatullah Khan Talent Awards</Text>
@@ -93,7 +97,19 @@ const Home = () => {
 
           <TouchableOpacity
             activeOpacity={1}
-           >
+            onPress={() => navigation.navigate('masterpage')}>
+            <View style={styles.card}>
+              <Icon name="book" size={50} style={styles.clr} />
+              <Text style={styles.clr}>Masters </Text>
+              <Text style={styles.clr}>Scholarship</Text>
+            </View>
+          </TouchableOpacity>
+
+        
+
+          <TouchableOpacity
+            activeOpacity={1}
+            onPress={() => navigation.navigate('fyp')}>
             <View style={styles.card}>
               <ProjectIcon
                 name="project-diagram"
@@ -104,24 +120,26 @@ const Home = () => {
             </View>
           </TouchableOpacity>
 
-          <TouchableOpacity activeOpacity={1}>
+          <TouchableOpacity
+            activeOpacity={1}
+            onPress={() => navigation.navigate('shortfilms')}>
             <View style={styles.card}>
               <Cap name="video-camera" size={38} style={styles.clr} />
               <View>
-              <Text style={styles.clr}>Short</Text>
-              <Text  style={styles.clr}>Film Funding</Text>
+                <Text style={styles.clr}>Short</Text>
+                <Text style={styles.clr}>Film Funding</Text>
               </View>
             </View>
           </TouchableOpacity>
 
-          <TouchableOpacity
+          {/* <TouchableOpacity
           activeOpacity={1}
           onPress={() => navigation.navigate('exam')}>
           <View style={styles.card}>
             <Paper name="copy-outline" size={38} style={styles.clr} />
             <Text style={styles.clr}>Exam</Text>
           </View>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         </View>
       </ScrollView>
     </>

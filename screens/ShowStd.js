@@ -174,12 +174,13 @@ const ShowStd = () => {
               style={{
                 fontSize: 20,
               }}>
-              Baisc Information
+              Basic Information
             </Text>
 
             <Button mode="contained" style={styles.button} onPress={showModal}>
               Edit
             </Button>
+            
           </View>
           <Divider />
           <View style={styles.div}>
@@ -217,11 +218,11 @@ const ShowStd = () => {
           </View>
           <Divider />
 
-          <View style={styles.div}>
+          {/* <View style={styles.div}>
             <Text style={styles.headding}>Phone</Text>
             <Text style={styles.text}>{data.otherNumber}</Text>
           </View>
-          <Divider />
+          <Divider /> */}
 
           <View style={styles.div}>
             <Text style={styles.headding}>Father Occupation</Text>
@@ -241,17 +242,17 @@ const ShowStd = () => {
           </View>
           <Divider />
 
-          <View style={styles.div}>
+          {/* <View style={styles.div}>
             <Text style={styles.headding}>LinkedIn</Text>
             <Text style={styles.text}>{data.linkedinAccount}</Text>
           </View>
-          <Divider />
+          <Divider /> */}
 
-          <View style={styles.div}>
+          {/* <View style={styles.div}>
             <Text style={styles.headding}>Instagram</Text>
             <Text style={styles.text}>{data.instagramAccount}</Text>
           </View>
-          <Divider />
+          <Divider /> */}
 
           <View style={styles.div}>
             <Text style={styles.headding}>Enrollment Date</Text>

@@ -1,4 +1,4 @@
-import {StyleSheet, Text, View, ScrollView} from 'react-native';
+import {StyleSheet, Text, View, ScrollView, Alert, Modal} from 'react-native';
 import React, {useState, useEffect} from 'react';
 import {
   Avatar,
@@ -13,90 +13,544 @@ import {color} from '../components/Colors';
 import CountDown from 'react-native-countdown-component';
 import {Formik} from 'formik';
 import * as Yup from 'yup';
+import Icon from 'react-native-vector-icons/Ionicons';
+import {useNavigation} from '@react-navigation/native';
 
 const ExamScreen = () => {
-  const handleStart = () => {};
-
-  const [examobj, setExamobj] = useState({});
-  const [questionIndex, setQuestionIndex] = useState(0);
-  const [examData, setExamData] = useState([]);
-
+  const navigation = useNavigation();
   const examquestionsfromapi = [
     {
       id: 1,
-      questionType: 'Checkbox',
-      question: 'What is the capital of India?',
-      option1: 'New Delhi',
-      option2: 'Mumbai',
-      option3: 'Chennai',
-      option4: 'Kolkata',
+      questionType: 'Radio',
+      question:
+        'It was Sunday on Jan 1, 2006. What was the day of the week Jan 1, 2010?',
+      options: [
+        {
+          id: 1,
+          option1: 'Sunday',
+          isChecked: false,
+        },
+        {
+          id: 2,
+          option1: 'Saturday',
+          isChecked: false,
+        },
+        {
+          id: 3,
+          option1: 'Friday',
+          isChecked: false,
+        },
+        {
+          id: 4,
+          option1: 'Wednesday',
+          isChecked: false,
+        },
+      ],
+    },
+    {
+      id: 2,
+      questionType: 'Radio',
+      question: '56% of Y is 182. What is Y?',
+      options: [
+        {
+          id: 1,
+          option1: '350',
+          isChecked: false,
+        },
+        {
+          id: 2,
+          option1: '364',
+          isChecked: false,
+        },
+        {
+          id: 3,
+          option1: '325',
+          isChecked: false,
+        },
+        {
+          id: 4,
+          option1: '330',
+          isChecked: false,
+        },
+      ],
+    },
+    {
+      id: 3,
+      questionType: 'Radio',
+      question: '3.52 ÷ 11 = ?',
+      options: [
+        {
+          id: 1,
+          option1: '0.32',
+          isChecked: false,
+        },
+        {
+          id: 2,
+          option1: '32',
+          isChecked: false,
+        },
+        {
+          id: 3,
+          option1: '0.032',
+          isChecked: false,
+        },
+        {
+          id: 4,
+          option1: '3.2',
+          isChecked: false,
+        },
+      ],
+    },
+    {
+      id: 4,
+      questionType: 'Radio',
+      question: '(3 x 3.9) ÷ 3 = ?',
+      options: [
+        {
+          id: 1,
+          option1: '0.39',
+          isChecked: false,
+        },
+        {
+          id: 2,
+          option1: '-3.9',
+          isChecked: false,
+        },
+        {
+          id: 3,
+          option1: '-0.39',
+          isChecked: false,
+        },
+        {
+          id: 4,
+          option1: '3.9',
+          isChecked: false,
+        },
+      ],
+    },
+    {
+      id: 5,
+      questionType: 'Radio',
+      question: 'Please, stop _______ so many mistakes.',
+      options: [
+        {
+          id: 1,
+          option1: 'to make',
+          isChecked: false,
+        },
+        {
+          id: 2,
+          option1: 'make',
+          isChecked: false,
+        },
+        {
+          id: 3,
+          option1: 'making',
+          isChecked: false,
+        },
+        {
+          id: 4,
+          option1: 'makes',
+          isChecked: false,
+        },
+      ],
+    },
+    {
+      id: 6,
+      questionType: 'Radio',
+      question: 'Please, dont laugh _______ those beggars..',
+      options: [
+        {
+          id: 1,
+          option1: 'For',
+          isChecked: false,
+        },
+        {
+          id: 2,
+          option1: 'Against',
+          isChecked: false,
+        },
+        {
+          id: 3,
+          option1: 'At',
+          isChecked: false,
+        },
+        {
+          id: 4,
+          option1: 'Form',
+          isChecked: false,
+        },
+      ],
+    },
+    {
+      id: 7,
+      questionType: 'Radio',
+      question: 'A computer possesses information',
+      options: [
+        {
+          id: 1,
+          option1: 'At once',
+          isChecked: false,
+        },
+        {
+          id: 2,
+          option1: 'As directed by the operator',
+          isChecked: false,
+        },
+        {
+          id: 3,
+          option1: 'Automatically',
+          isChecked: false,
+        },
+        {
+          id: 4,
+          option1: 'Gradually and eventually',
+          isChecked: false,
+        },
+      ],
+    },
+    {
+      id: 8,
+      questionType: 'Radio',
+      question: 'Web browser is an example of a',
+      options: [
+        {
+          id: 1,
+          option1: 'Client agent',
+          isChecked: false,
+        },
+        {
+          id: 2,
+          option1: 'Server agent',
+          isChecked: false,
+        },
+        {
+          id: 3,
+          option1: 'User agent',
+          isChecked: false,
+        },
+        {
+          id: 4,
+          option1: 'All of these',
+          isChecked: false,
+        },
+      ],
+    },
+    {
+      id: 9,
+      questionType: 'Radio',
+      question: 'Every Web page has a unique address called',
+      options: [
+        {
+          id: 1,
+          option1: 'URL',
+          isChecked: false,
+        },
+        {
+          id: 2,
+          option1: 'ARL',
+          isChecked: false,
+        },
+        {
+          id: 3,
+          option1: 'RUL',
+          isChecked: false,
+        },
+        {
+          id: 4,
+          option1: 'LUR',
+          isChecked: false,
+        },
+      ],
+    },
+    {
+      id: 10,
+      questionType: 'Radio',
+      question: 'The CPU and memory are located on the',
+      options: [
+        {
+          id: 1,
+          option1: 'Expansion board',
+          isChecked: false,
+        },
+        {
+          id: 2,
+          option1: 'Motherboard',
+          isChecked: false,
+        },
+        {
+          id: 3,
+          option1: 'Storage device',
+          isChecked: false,
+        },
+        {
+          id: 4,
+          option1: 'Output device',
+          isChecked: false,
+        },
+      ],
     },
   ];
+  const [modalVisible, setModalVisible] = useState(false);
+  const [state, setState] = useState(examquestionsfromapi);
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [backdisbaled, setBackDisabled] = useState(true);
+  const [radiox, setRadiox] = useState(false);
 
-  console.log('ExamScreen', examData);
+  console.log(state);
+
+  const finalarr = state.filter(item => {
+    return item.options.filter(item => {
+      return item.isChecked === true;
+    });
+  });
+
+  finalarr.map(e => {
+    console.log(e);
+  });
+
+  // console.log(answers);
 
   return (
     <>
-      {/* ADD QUESTION ONE DATA INTO OBJECT */}
-      <Text>{examquestionsfromapi[questionIndex].question}</Text>
-      <CheckBox
-        value={examData.some(
-          item => item.option1 === examquestionsfromapi[questionIndex].option1,
-        )}
-        onValueChange={() => {
-          //check
-          if (
-            examData.some(
-              item =>
-                item.option1 === examquestionsfromapi[questionIndex].option1,
-            )
-          ) {
-            //uncheck
-            setExamData(
-              examData.filter(
-                item =>
-                  item.option1 !== examquestionsfromapi[questionIndex].option1,
-              ),
-            );
-          }
-          //uncheck
-          else {
-            setExamData({
-              ...examData,
-              Option1: examquestionsfromapi[questionIndex].option1,
-            });
-          }
-        }}
-      />
+      <View>
+        <Text
+          style={{
+            fontSize: 30,
+            fontWeight: 'bold',
+            textAlign: 'center',
+            marginVertical: 20,
+            color: color.primary,
+          }}>
+          DEMO EXAM
+        </Text>
+      </View>
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: color.light,
+          padding: 20,
+          justifyContent: 'center',
+        }}>
+        <Text
+          style={{
+            fontSize: 20,
+            fontWeight: 'bold',
+          }}>
+          {state[currentQuestion].question}
+        </Text>
+          {/* radio group */}
+          
+             {/* {state[currentQuestion].options.map((item,i) => {
+              return (
+                <View key={item.id}>
+                 <RadioButton.Group
+                  value={state[currentQuestion].options[i].isChecked}
+                  onValueChange={value => {
+                    setState(
+                      state.map(item => {
+                        if (item.id !== state[currentQuestion].id) {
+                          item.options[i].isChecked = value;
+                        }
+                        return item;
+                      }
+                      )
+                    );
+                  }
+                  }
+                  >
+                    <View style={{ flexDirection: 'row' }}>
+                      <RadioButton
+                        value={
+                          state[currentQuestion].options[i].isChecked}
+                        label={item.option1}
+                        labelStyle={{ fontSize: 18 }}
+                        status={
+                          state[currentQuestion].options[i].isChecked
+                            ? 'unchecked'
+                            : 'checked'
+                        }
+                      />
+                      <Text style={{ fontSize: 18, marginRight: 10 }}>
+                        {item.option1}
+                      </Text>
+                     
+                      </View>
+                  </RadioButton.Group>
 
-      <CheckBox
-        value={examData.some(
-          item => item.option2 === examquestionsfromapi[questionIndex].option2,
-        )}
-        onValueChange={() => {
-          //check
-          if (
-            examData.some(
-              item =>
-                item.option2 === examquestionsfromapi[questionIndex].option2,
-            )
-          ) {
-            setExamData(
-              examData.filter(
-                item =>
-                  item.option2 !== examquestionsfromapi[questionIndex].option2,
-              ),
-            );
-          }
-          //uncheck
-          else {
-            setExamData({
-              ...examData,
-              Option2: examquestionsfromapi[questionIndex].option2,
-            });
-          }
-        }}
-      />
+                </View>
+              );
+            }
+            )}  */}
+          
+            
+            {state[currentQuestion].questionType === 'Radio' ? (
+              state[currentQuestion].options.map((item, i) => {
+                return (
+                  <View key={item.id}>
+                    <RadioButton.Group>
+                        <View style={{ flexDirection: 'row' }}>
+                          <RadioButton
+                           
+                          />
+                          <Text style={{ fontSize: 18, marginRight: 10 }}>
+                            {item.option1}
+                          </Text>
+                          </View>
+                    </RadioButton.Group>
+                  </View>
+                );
+              }
+              )
+            ) : (
+              <>
+                {state[currentQuestion].options.map((item, i) => {
+              return (
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    marginVertical: 5,
+                  }}>
+                  <CheckBox
+                    key={item.id}
+                    value={item.isChecked}
+                    onValueChange={() => {
+                      item.isChecked = !item.isChecked;
+                      setState([...state]);
+                    }}
+                  />
+                  <Text>{item.option1}</Text>
+                </View>
+              );
+            })}
+              </>
+            )}
+
+
+      
+          
+
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginVertical: 20,
+          }}>
+          <Button
+            color={color.card}
+            disabled={currentQuestion === 0 ? true : false}
+            onPress={() => {
+              setCurrentQuestion(currentQuestion - 1);
+            }}>
+            Back
+          </Button>
+          {currentQuestion === state.length - 1 ? (
+            <>
+              <Button onPress={() => [setModalVisible(true)]}>Finish</Button>
+              <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => {
+                  Alert.alert('Modal has been closed.');
+                  setModalVisible(!modalVisible);
+                }}>
+                <View style={styles.centeredView}>
+                  <View style={styles.modalView}>
+                    <Icon
+                      name="checkmark-circle-outline"
+                      size={40}
+                      color={color.primary}
+                    />
+                    <Text style={styles.modalText}>
+                      Thank You. For Attempt Demo Exam
+                    </Text>
+                    <Button
+                      color={color.primary}
+                      onPress={() => {
+                        setModalVisible(!modalVisible);
+
+                        navigation.navigate('home');
+                      }}>
+                      Ok
+                    </Button>
+                  </View>
+                </View>
+              </Modal>
+            </>
+          ) : (
+            <>
+              <Button
+                color={color.card}
+                disabled={currentQuestion === state.length - 1 ? true : false}
+                onPress={() => {
+                  setCurrentQuestion(currentQuestion + 1);
+                }}>
+                Next
+              </Button>
+            </>
+          )}
+        </View>
+      </View>
+
+      {/* {state.map((item, index) => {
+        return (
+          <>
+            <View key={index}>
+              <Text>{item.question}</Text>
+              {item.questionType === 'Checkbox' ? (
+                <View>
+                  {item.options.map((opt, index) => {
+                    return (
+                      <View key={index}>
+                        <CheckBox
+                          value={opt.isChecked}
+                          onValueChange={() => {
+                            item.options[index].isChecked = !opt.isChecked;
+                            //change option value string to null
+                            setState([...state]);
+                          }}
+                        />
+                        <Text>{opt.option1}</Text>
+                      </View>
+                    );
+                  })}
+                </View>
+              ) : (
+                item.questionType === 'radio' && (
+                  <RadioButton.Group
+                    onValueChange={value => {
+                      item.options.map(opt => {
+                        if (opt.id === value) {
+                          opt.isChecked = true;
+                        } else {
+                          opt.isChecked = false;
+                        }
+                        return opt;
+                      });
+                      setState([...state]);
+                    }}
+                    //value id
+                    value={
+                      item.options.filter(opt => opt.isChecked === true)[0]
+                    }>
+                    {item.options.map((opt, index) => {
+                      return (
+                        <View key={index}>
+                          <RadioButton value={opt.id} color={color.primary} />
+                          <Text>{opt.option1}</Text>
+                        </View>
+                      );
+                    })}
+                  </RadioButton.Group>
+                )
+              )}
+            </View>
+          </>
+        );
+      })} */}
 
       {/* <View
         style={{
@@ -237,4 +691,46 @@ const ExamScreen = () => {
 
 export default ExamScreen;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  button: {
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2,
+  },
+  buttonOpen: {
+    backgroundColor: '#F194FF',
+  },
+  buttonClose: {
+    backgroundColor: '#2196F3',
+  },
+  textStyle: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: 'center',
+  },
+});
