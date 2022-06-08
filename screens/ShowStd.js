@@ -1,4 +1,6 @@
-import {StyleSheet, View, ScrollView, TouchableOpacity} from 'react-native';
+import {StyleSheet, View, ScrollView, TouchableOpacity,  Alert,
+  
+  Pressable} from 'react-native';
 import React, {useState, useEffect} from 'react';
 import {
   Button,
@@ -24,8 +26,11 @@ import {color} from '../components/Colors';
 import DatePicker from 'react-native-date-picker';
 import RNPickerSelect from 'react-native-picker-select';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import Icon from 'react-native-vector-icons/Ionicons';
+
 
 const ShowStd = () => {
+  const navigation = useNavigation();
   const [token, setToken] = useState('');
   const [visible, setVisible] = React.useState(false);
   const [data, setData] = useState([]);
@@ -42,56 +47,14 @@ const ShowStd = () => {
 
   const [district, setDistrict] = useState([]);
   const [city, setCity] = useState([]);
-  const [id,setId] =  useState('');
+  const [id, setId] = useState('');
 
   useEffect(() => {
-    const getToken = async () => {
-      try {
-        const value = AsyncStorage.getItem('@userlogininfo');
-        if (value !== null) {
-          // We have data!!
-          const data = JSON.parse(value);
-          
-          console.log("TOKEN" + data);
-          setToken(data.token);
-        }
-      } catch (error) {
-        // Error retrieving data
-        console.log(error.message);
-      }
-    };
-
-    const District = async () => {
-      await axios
-        .get(`${BASE_URL}/Area/GetAll`, {
-          headers: {Authorization: `Bearer ${token}`},
-        })
-        .then(res => {
-          // console.log(res.data);
-          setDistrict(res.data);
-        })
-        .catch(err => {
-          console.log(err);
-        });
-    };
-    const getCity = async () => {
-      await axios
-        .get(`${BASE_URL}/City/GetAll`, {
-          headers: {Authorization: `Bearer ${token}`},
-        })
-        .then(res => {
-          // console.log(res.data);
-          setCity(res.data);
-        })
-        .catch(err => {
-          console.log(err);
-        });
-    };
-
     const getstudent = async () => {
       const value = await AsyncStorage.getItem('@userlogininfo');
       if (value !== null) {
         const data = JSON.parse(value);
+        setToken(data.token);
         axios
           .get(`${BASE_URL}/Student/GetByUserIdWithRelationShip`, {
             headers: {
@@ -100,11 +63,23 @@ const ShowStd = () => {
           })
           .then(res => {
             console.log('DATA : ', res.data);
-            const {student,user} = res.data;
+            const {student, user} = res.data;
 
             setData(student);
-            setId(user.id)
+            setId(user.id);
             console.log(student);
+          })
+          .catch(err => {
+            console.log(err);
+          });
+
+        await axios
+          .get(`${BASE_URL}/City/GetAll`, {
+            headers: {Authorization: `Bearer ${data.token}`},
+          })
+          .then(res => {
+            // console.log(res.data);
+            setCity(res.data);
           })
           .catch(err => {
             console.log(err);
@@ -112,12 +87,9 @@ const ShowStd = () => {
       }
     };
 
-    getToken();
-    District();
-    getCity();
     getstudent();
     console.log(token);
-  }, []);
+  }, [visible]);
 
   const handleArea = value => {
     console.log(value + 'ID');
@@ -183,7 +155,7 @@ const ShowStd = () => {
   const today = new Date().toISOString().split('T')[0];
 
   console.log(id);
-
+  const [modalVisible, setModalVisible] = useState(false);
   return (
     <>
       <ScrollView>
@@ -199,7 +171,6 @@ const ShowStd = () => {
             <Button mode="contained" style={styles.button} onPress={showModal}>
               Edit
             </Button>
-            
           </View>
           <Divider />
           <View style={styles.div}>
@@ -305,110 +276,100 @@ const ShowStd = () => {
                 email: '' || data.email,
               }}
               onSubmit={(values, actions) => {
+                console.log(token, 'token');
+
+                console.log(token);
                 console.log({
-                           
-                            whatsappNumber: values.whatsappNumber, //
-                            email: values.email, //
-                            fatherName: values.fatherName, //
-                            whatsappNumber: values.whatsappNumber, //
-                            otherNumber: null, //
-                            facebookAccount: values.facebookAccount, //
-                            instagramAccount: null,
-                            linkedinAccount: null,
-                            presentAddress: values.presentAddress, //
-                            cnic: values.cnic, //
-                            enrollmentDate: today, //
-                            gender: values.gender, //
-                            cityId: values.cityId, //
-                            fatherOccupation: values.fatherOccupation, //
-                            dob: values.dob, //
-                            email: values.email, //
-                            "active": "string",
-                            userId: 0, //
-                            areaId: values.areaId, //
+                  whatsappNumber: values.whatsappNumber, //
+                  email: values.email, //
+                  fatherName: values.fatherName, //
+                  whatsappNumber: values.whatsappNumber, //
+                  otherNumber: null, //
+                  facebookAccount: values.facebookAccount, //
+                  instagramAccount: null,
+                  linkedinAccount: null,
+                  presentAddress: values.presentAddress, //
+                  cnic: values.cnic, //
+                  enrollmentDate: today, //
+                  gender: values.gender, //
+                  cityId: values.cityId, //
+                  fatherOccupation: values.fatherOccupation, //
+                  dob: values.dob, //
+                  email: values.email, //
+                  active: 'string',
+                  userId: 0, //
+                  areaId: values.areaId, //
                 });
 
-                const postdata = async () => {
-                  try {
-                    const value = AsyncStorage.getItem('@userlogininfo');
-                    if (value !== null) {
-                      const data = JSON.parse(value);
-                      const {token } = data;
-                      console.log(token);
-                     
-
-                      
+                axios
+                  .put(
+                    `${BASE_URL}/Student/Update?id=${id}`,
+                    {
+                      whatsappNumber: values.whatsappNumber, //
+                      email: values.email, //
+                      fatherName: values.fatherName, //
+                      whatsappNumber: values.whatsappNumber, //
+                      otherNumber: null, //
+                      facebookAccount: values.facebookAccount, //
+                      instagramAccount: null,
+                      linkedinAccount: null,
+                      presentAddress: values.presentAddress, //
+                      cnic: values.cnic, //
+                      enrollmentDate: null, //
+                      gender: values.gender, //
+                      cityId: values.cityId, //
+                      fatherOccupation: values.fatherOccupation, //
+                      dob: values.dob, //
+                      email: values.email, //
+                      userId: 0, //
+                      areaId: values.areaId, //
+                    },
+                    {
+                      headers: {
+                        Authorization: `Bearer ${token}`,
+                      },
+                    },
+                  )
+                  .then(res => {
+                    console.log('DATA UPDATED');
+                    //setAlert and Navigate to home
+                    Alert.alert(
+                      'Success',
+                      'Data Updated Successfully',
+                      [
+                        {
+                          text: 'OK',
+                          onPress: () => {
+                            navigation.navigate('TabNavigator');
+                          },
+                        },
+                      ],
+                      {cancelable: false},
+                    );
+                
+                 
+                
                     
 
-                      axios
-                        .put(
-                          `${BASE_URL}/Student/Update?id=${id}`,
-                          {
-                            whatsappNumber: values.whatsappNumber, //
-                            email: values.email, //
-                            fatherName: values.fatherName, //
-                            whatsappNumber: values.whatsappNumber, //
-                            otherNumber: null, //
-                            facebookAccount: values.facebookAccount, //
-                            instagramAccount: null,
-                            linkedinAccount: null,
-                            presentAddress: values.presentAddress, //
-                            cnic: values.cnic, //
-                            enrollmentDate: today, //
-                            gender: values.gender, //
-                            cityId: values.cityId, //
-                            fatherOccupation: values.fatherOccupation, //
-                            dob: values.dob, //
-                            email: values.email, //
-                           
-                            userId: 0, //
-                            areaId: values.areaId, //
-                          },
-                          {
-                            headers: {
-                              Authorization: `Bearer ${data.token}`,
-                            },
-                          },
-                        )
-                        .then(res => {
-                          console.log('DATA UPDATED');
-                          const postimg = async () => {
-                            try {
-                              const value =
-                                AsyncStorage.getItem('@userlogininfo');
-                              if (value !== null) {
-                                const data = JSON.parse(value);
-                                axios.post(
-                                  `${BASE_URL}/Student/AddImage`,
-                                  {
-                                    image: image,
-                                    ext: ext,
-                                  },
-                                  {
-                                    headers: {
-                                      Authorization: `Bearer ${data.token}`,
-                                    },
-                                  },
-                                );
-                              }
-                            } catch {
-                              console.log('error');
-                            }
-                          };
-
-                          postimg();
-
-                          console.log(res.data);
-                        })
-                        .catch(err => {
-                          console.log('DATA NOT UPDATED');
-                        });
-                    }
-                  } catch {
-                    console.log('ERROR');
-                  }
-                };
-                postdata();
+                    navigation.navigate('TabNavigator');
+                    axios.post(
+                      `${BASE_URL}/Student/AddImage`,
+                      {
+                        image: image,
+                        ext: ext,
+                      },
+                      {
+                        headers: {
+                          Authorization: `Bearer ${token}`,
+                        },
+                      },
+                    );
+                    
+                    console.log(res.data);
+                  })
+                  .catch(err => {
+                    console.log('DATA NOT UPDATED');
+                  });
               }}>
               {({
                 handleChange,
@@ -440,6 +401,23 @@ const ShowStd = () => {
                         style={{marginHorizontal: 20}}
                         visible={touched.fatherName && errors.fatherName}>
                         {touched.fatherName && errors.fatherName}
+                      </HelperText>
+                      <TextInput
+                        style={{marginHorizontal: 20, marginVertical: 10}}
+                        mode="flat"
+                        placeholder="Father Occupation"
+                        name="fatherOccupation"
+                        onChangeText={handleChange('fatherOccupation')}
+                        value={values.fatherOccupation}
+                        onBlur={handleBlur('fatherOccupation')}
+                      />
+                      <HelperText
+                        type="error"
+                        style={{marginHorizontal: 20}}
+                        visible={
+                          touched.fatherOccupation && errors.fatherOccupation
+                        }>
+                        {touched.fatherOccupation && errors.fatherOccupation}
                       </HelperText>
 
                       {/* <TextInput
@@ -495,7 +473,7 @@ const ShowStd = () => {
 
                       <RadioButton.Group
                         onValueChange={handleChange('gender')}
-                        value={data.gender}>
+                        value={values.gender}>
                         <RadioButton.Item
                           color={color.primary}
                           style={{marginHorizontal: 20}}
@@ -565,62 +543,62 @@ const ShowStd = () => {
                         }}
                       />
 
-<View>
-                      <Text
-                        style={{
-                          marginHorizontal: 20,
-                          fontSize: 18,
-                          color: '#000',
-                        }}>
-                        City
-                      </Text>
-                      <RNPickerSelect
-                        onValueChange={(value, index) => {
-                          setFieldValue('cityId', value);
-                          handleArea(value);
-                        }}
-                        placeholder={{
-                          label: 'Select City',
-                          value: null,
-                        }}
-                        items={cityarr}
-                        value={values.cityId}
-                      />
-                      <HelperText
-                        type="error"
-                        style={{marginHorizontal: 20}}
-                        visible={touched.cityId && errors.cityId}>
-                        {touched.cityId && errors.cityId}
-                      </HelperText>
-                    </View>
+                      <View>
+                        <Text
+                          style={{
+                            marginHorizontal: 20,
+                            fontSize: 18,
+                            color: '#000',
+                          }}>
+                          City
+                        </Text>
+                        <RNPickerSelect
+                          onValueChange={(value, index) => {
+                            setFieldValue('cityId', value);
+                            handleArea(value);
+                          }}
+                          placeholder={{
+                            label: 'Select City',
+                            value: null,
+                          }}
+                          items={cityarr}
+                          value={values.cityId}
+                        />
+                        <HelperText
+                          type="error"
+                          style={{marginHorizontal: 20}}
+                          visible={touched.cityId && errors.cityId}>
+                          {touched.cityId && errors.cityId}
+                        </HelperText>
+                      </View>
 
-                    <View>
-                      <Text
-                        style={{
-                          marginHorizontal: 20,
-                          fontSize: 18,
-                          color: '#000',
-                        }}>
-                        Area
-                      </Text>
-                      <RNPickerSelect
-                        onValueChange={(value, index) => {
-                          setFieldValue('areaId', value);
-                        }}
-                        placeholder={{
-                          label: 'Select Area',
-                          value: null,
-                        }}
-                        items={areaarr}
-                        value={values.areaId}
-                      />
-                      <HelperText
-                        type="error"
-                        style={{marginHorizontal: 20}}
-                        visible={touched.areaId && errors.areaId}>
-                        {touched.areaId && errors.areaId}
-                      </HelperText>
-                    </View>
+                      <View>
+                        <Text
+                          style={{
+                            marginHorizontal: 20,
+                            fontSize: 18,
+                            color: '#000',
+                          }}>
+                          Area
+                        </Text>
+                        <RNPickerSelect
+                          onValueChange={(value, index) => {
+                            setFieldValue('areaId', value);
+                          }}
+                          placeholder={{
+                            label: 'Select Area',
+                            value: null,
+                          }}
+                          items={areaarr}
+                          value={values.areaId}
+                        />
+                        <HelperText
+                          type="error"
+                          style={{marginHorizontal: 20}}
+                          visible={touched.areaId && errors.areaId}>
+                          {touched.areaId && errors.areaId}
+                        </HelperText>
+                      </View>
 
                       <TextInput
                         style={{marginHorizontal: 20, marginVertical: 10}}
@@ -636,24 +614,6 @@ const ShowStd = () => {
                         style={{marginHorizontal: 20}}
                         visible={touched.cnic && errors.cnic}>
                         {touched.cnic && errors.cnic}
-                      </HelperText>
-
-                      <TextInput
-                        style={{marginHorizontal: 20, marginVertical: 10}}
-                        mode="flat"
-                        placeholder="Father/Guardian"
-                        name="fatherOccupation"
-                        onChangeText={handleChange('fatherOccupation')}
-                        value={values.fatherOccupation}
-                        onBlur={handleBlur('fatherOccupation')}
-                      />
-                      <HelperText
-                        type="error"
-                        style={{marginHorizontal: 20}}
-                        visible={
-                          touched.fatherOccupation && errors.fatherOccupation
-                        }>
-                        {touched.fatherOccupation && errors.fatherOccupation}
                       </HelperText>
 
                       <TextInput
@@ -761,9 +721,13 @@ const ShowStd = () => {
                 </>
               )}
             </Formik>
+            
           </Modal>
         </Portal>
       </Provider>
+
+     
+      
     </>
   );
 };

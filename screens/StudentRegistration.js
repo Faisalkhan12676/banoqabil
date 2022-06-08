@@ -55,15 +55,16 @@ const StudentRegistration = () => {
   const [isloading, setIsLoading] = useState(true);
   const [isImg, setIsImg] = useState(false);
   const [validateImg, setValidateImg] = useState(false);
+  const [isbtn, setIsbtn] = useState(false);
 
-  const size = 'normal';
-  const $recaptcha = useRef();
-  const handleOpenPress = useCallback(() => {
-    $recaptcha.current.open();
-  }, []);
-  const handleClosePress = useCallback(() => {
-    $recaptcha.current.close();
-  }, []);
+  // const size = 'normal';
+  // const $recaptcha = useRef();
+  // const handleOpenPress = useCallback(() => {
+  //   $recaptcha.current.open();
+  // }, []);
+  // const handleClosePress = useCallback(() => {
+  //   $recaptcha.current.close();
+  // }, []);
 
   useEffect(() => {
     //GET USER ID FROM ASYNC STORAGE
@@ -251,6 +252,7 @@ const StudentRegistration = () => {
             }}
             validationSchema={validation}
             onSubmit={async (values, {resetForm}) => {
+              setIsbtn(true);
              
 
               axios
@@ -284,6 +286,7 @@ const StudentRegistration = () => {
                   if(isImg){
                     console.log('DATA POSTED');
                     navigate.navigate('edu');
+                    setIsbtn(false);
                     axios.post(
                       `${BASE_URL}/Student/AddImage`,
                       {
@@ -295,7 +298,11 @@ const StudentRegistration = () => {
                           Authorization: `Bearer ${token}`,
                         },
                       },
-                    );
+                    ).then((res)=>{
+                     
+                    }).catch((err)=>{
+                      console.log(err);
+                    });
                     resetForm();
                   }else{
                     console.log("ADD IMAGE FIRST");
@@ -327,7 +334,7 @@ const StudentRegistration = () => {
                     <TextInput
                       style={{marginHorizontal: 20, marginVertical: 10}}
                       mode="flat"
-                      placeholder="Father Name"
+                      placeholder="Father Name/Guardian Name"
                       name="fatherName"
                       onChangeText={handleChange('fatherName')}
                       value={values.fatherName}
@@ -339,6 +346,25 @@ const StudentRegistration = () => {
                       style={{marginHorizontal: 20}}
                       visible={touched.fatherName && errors.fatherName}>
                       {touched.fatherName && errors.fatherName}
+                    </HelperText>
+
+                    <TextInput
+                      style={{marginHorizontal: 20, marginVertical: 10}}
+                      mode="flat"
+                      placeholder="Father Occupation"
+                      name="FatherOccupation"
+                      onChangeText={handleChange('FatherOccupation')}
+                      value={values.FatherOccupation}
+                      onBlur={handleBlur('FatherOccupation')}
+                      activeUnderlineColor={color.primary}
+                    />
+                    <HelperText
+                      type="error"
+                      style={{marginHorizontal: 20}}
+                      visible={
+                        touched.FatherOccupation && errors.FatherOccupation
+                      }>
+                      {touched.FatherOccupation && errors.FatherOccupation}
                     </HelperText>
 
                     {/* <TextInput
@@ -566,24 +592,7 @@ const StudentRegistration = () => {
                       {touched.cnic && errors.cnic}
                     </HelperText>
 
-                    <TextInput
-                      style={{marginHorizontal: 20, marginVertical: 10}}
-                      mode="flat"
-                      placeholder="Father/Guardian"
-                      name="FatherOccupation"
-                      onChangeText={handleChange('FatherOccupation')}
-                      value={values.FatherOccupation}
-                      onBlur={handleBlur('FatherOccupation')}
-                      activeUnderlineColor={color.primary}
-                    />
-                    <HelperText
-                      type="error"
-                      style={{marginHorizontal: 20}}
-                      visible={
-                        touched.FatherOccupation && errors.FatherOccupation
-                      }>
-                      {touched.FatherOccupation && errors.FatherOccupation}
-                    </HelperText>
+                   
 
                     <TextInput
                       style={{marginHorizontal: 20, marginVertical: 10}}
@@ -659,13 +668,15 @@ const StudentRegistration = () => {
 
                     <View>
                       <Button
+                      loading={isbtn}
+                        disabled={isbtn}
                         mode="contained"
                         style={{
                           backgroundColor: color.primary,
                           marginHorizontal: 10,
                           marginVertical: 15,
                         }}
-                        onPress={handleOpenPress}>
+                        onPress={handleSubmit}>
                           
                         Submit
                       </Button>
@@ -684,7 +695,7 @@ const StudentRegistration = () => {
                           onPress={resetForm}>
                           Clear
                         </Button>
-                        <Recaptcha
+                        {/* <Recaptcha
                           ref={$recaptcha}
                           lang="en"
                           headerComponent={
@@ -738,7 +749,7 @@ const StudentRegistration = () => {
                             console.log(token);
                             handleSubmit();
                           }}
-                        />
+                        /> */}
 
                         {/* <Button
                         mode='text'

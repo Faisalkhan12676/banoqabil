@@ -340,11 +340,8 @@ const ExamScreen = () => {
           {state[currentQuestion].question}
         </Text>
           {/* radio group */}
-          
-            
-          
-            
-            {/* {state[currentQuestion].questionType === 'Radio' ? (
+
+      {/* {state[currentQuestion].questionType === 'Radio' ? (
               state[currentQuestion].options.map((item, i) => {
                 return (
                   <View key={item.id}>
@@ -393,19 +390,35 @@ const ExamScreen = () => {
               </>
             )} */}
 
-            
+      <View
+        style={{
+          height: 70,
+          width: '100%',
+          backgroundColor: color.primary,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}></View>
 
-
-            {
-              state[currentQuestion].questionType === 'Checkbox' ? (
-                <>
-                  {state[currentQuestion].options.map((item, i) => {
-                    return (
+      <View
+        style={{
+          flex: 1,
+        }}>
+        {state[currentQuestion].questionType === 'Checkbox' ? (
+          <>
+            <Card
+              style={{
+                margin: 10,
+              }}>
+              <Card.Content>
+                <Title>{state[currentQuestion].question}</Title>
+                {state[currentQuestion].options.map((item, i) => {
+                  return (
+                    <>
                       <View
-                        key={item.id}
                         style={{
                           flexDirection: 'row',
                           alignItems: 'center',
+                          marginLeft: 15,
                           marginVertical: 5,
                         }}>
                         <CheckBox
@@ -413,73 +426,84 @@ const ExamScreen = () => {
                           onValueChange={() => {
                             item.isChecked = !item.isChecked;
                             setState([...state]);
-                          }
-                          }
+                          }}
                         />
-                        <Text>{item.option1}</Text>
+                        <Paragraph>{item.option1}</Paragraph>
                       </View>
-                    );
-                  })}
+                    </>
+                  );
+                })}
+              </Card.Content>
+            </Card>
+          </>
+        ) : (
+          <>
+           <Card
+              style={{
+                margin: 10,
+              }}>
+              <Card.Content>
+                <Title>{state[currentQuestion].question}</Title>
 
-                </>
-              ):(
-                <>
-                  {state[currentQuestion].options.map((item, i) => {
-                    return (
-                      <View
-                        key={item.id}
-                        style={{
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                          marginVertical: 5,
-                        }}>
-                        <RadioButton.Group
-                          onValueChange={(e) => {
-                           //if option1 is checked then set all other options to false
-                            if(e === item.option1){
-                              state[currentQuestion].options.map((item, i) => {
-                                item.isChecked = false;
-                              });
-                              item.isChecked = true;
-                              setState([...state]);
-                            }
-
-                            
-                            
-                          }}>
-                        
-                          <View style={{ flexDirection: 'row' }}>
-                            <RadioButton.Item
-                              value={item.option1}
-                              status={item.isChecked ? 'checked' : 'unchecked'}
-                              />
-                            <Text style={{ fontSize: 18, marginRight: 10 }}>
-                              {item.option1}
-                            </Text>
-                            </View>
-                        </RadioButton.Group>
+            {state[currentQuestion].options.map((item, i) => {
+              return (
+               
+                  <RadioButton.Group
+                    onValueChange={e => {
+                      //if option1 is checked then set all other options to false
+                      if (e === item.option1) {
+                        state[currentQuestion].options.map((item, i) => {
+                          item.isChecked = false;
+                        });
+                        item.isChecked = true;
+                        setState([...state]);
+                      }
+                    }}>
+                    <View style={{flexDirection: 'row' , alignItems:'center'}}>
+                      <RadioButton.Item
+                        value={item.option1}
+                        status={item.isChecked ? 'checked' : 'unchecked'}
+                      />
+                      <Paragraph>{item.option1}</Paragraph>
                       </View>
-                    );
-                  })}
+                  </RadioButton.Group>
+              );
+            })}
+             </Card.Content>
+            </Card>
+          </>
+        )}
 
-                </>
-              )
-            }
+          <View style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            marginVertical: 10,
+            paddingHorizontal:10
 
-            <Button onPress={()=>{
-              setCurrentQuestion(currentQuestion+1);
-            }} >ADD</Button>
-             <Button onPress={()=>{
-              setCurrentQuestion(currentQuestion-1);
-            }} >BACK</Button>
+          }}>
+        <Button
+        
+          color={color.primary}
+          onPress={() => {
+            setCurrentQuestion(currentQuestion + 1);
+          }}>
+          ADD
+        </Button>
+        <Button
+        mode='contained'
+        style={{
+          backgroundColor: color.primary,
+        }}
+          onPress={() => {
+            setCurrentQuestion(currentQuestion - 1);
+          }}>
+          BACK
+        </Button>
+        </View>
 
+      </View>
 
-
-          
-
-       
-
-      
+      {/*       
 
       <View
         style={{
@@ -613,7 +637,7 @@ const ExamScreen = () => {
           >
           Start Exam
         </Button>
-      </View>
+      </View> */}
     </>
   );
 };

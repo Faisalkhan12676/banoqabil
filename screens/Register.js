@@ -1,6 +1,6 @@
-import {StyleSheet, Text, View, TouchableOpacity, Image} from 'react-native';
-import React, {useState, useEffect} from 'react';
-import {TextInput, HelperText} from 'react-native-paper';
+import {StyleSheet, Text, View, TouchableOpacity, Image,SafeAreaView} from 'react-native';
+import React, {useState, useEffect,useRef,useCallback} from 'react';
+import {TextInput, HelperText,ActivityIndicator} from 'react-native-paper';
 import {Button} from 'react-native-paper';
 import {Formik, useFormik} from 'formik';
 import * as Yup from 'yup';
@@ -10,6 +10,8 @@ import {useNavigation} from '@react-navigation/native';
 import {color} from '../components/Colors';
 import {BASE_URL} from '../config';
 import {useDispatch} from 'react-redux';
+import Recaptcha from 'react-native-recaptcha-that-works';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const validation = Yup.object().shape({
   name: Yup.string().required('Name is required'),
@@ -22,11 +24,21 @@ const validation = Yup.object().shape({
     .required('Phone number is required'),
 });
 
+
+
 const Register = () => {
   const [isloading, setIsLoading] = useState(false);
   const [eye, setEye] = useState(true);
   const navigate = useNavigation();
   const dispatch = useDispatch();
+  const size = 'normal';
+  const $recaptcha = useRef();
+  const handleOpenPress = useCallback(() => {
+    $recaptcha.current.open();
+  }, []);
+  const handleClosePress = useCallback(() => {
+    $recaptcha.current.close();
+  }, []);
   //img sourse
 
   return (
@@ -173,12 +185,67 @@ const Register = () => {
                   </HelperText>
                   <Button
                     loading={isloading}
-                    onPress={handleSubmit}
+                    onPress={handleOpenPress}
                     disabled={isloading}
                     mode="contained"
                     style={styles.button}>
                     Register
                   </Button>
+                  <Recaptcha
+                          ref={$recaptcha}
+                          lang="en"
+                          headerComponent={
+                            <SafeAreaView>
+                              <View
+                                style={{
+                                  flexDirection: 'row',
+                                  justifyContent: 'flex-end',
+                                  alignItems: 'center',
+                                  paddingVertical: 10,
+                                }}>
+                                <Icon
+                                  name="close"
+                                  size={30}
+                                  style={{marginRight: 10}}
+                                  onPress={handleClosePress}
+                                />
+                              </View>
+                            </SafeAreaView>
+                          }
+                          loadingComponent={
+                            <>
+                              <ActivityIndicator color="green" />
+                              <Text style={{color: '#fff'}}>
+                                Loading reCaptcha...
+                              </Text>
+                            </>
+                          }
+                          siteKey="6LfkbEMgAAAAAIkc9Cd-pls5ZspaVywaGQfgG4Dl"
+                          baseUrl="http://127.0.0.1"
+                          size={size}
+                          theme="light"
+                          onError={err => {
+                            alert('SOMETHING WENT WRONG');
+                            // console.warn(err);
+                          }}
+                          onExpire={() => alert('TOKEN EXPIRED')}
+                          onVerify={token => {
+                            axios
+                              .post(`${BASE_URL}/Auth/Recaptcha?token=${token}`)
+                              .then(res => {
+                                if (res.data === true) {
+                                  handleSubmit();
+                                } else {
+                                  alert('Verification failed');
+                                }
+                              })
+                              .catch(err => {
+                                console.log(err);
+                              });
+                          
+                          }}
+                        />
+                 
                   <TouchableOpacity onPress={() => navigate.navigate('Login')}>
                     <Text style={{textAlign: 'center', color: '#000'}}>
                       Already Have Account?

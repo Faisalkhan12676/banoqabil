@@ -19,6 +19,8 @@ import {BASE_URL} from '../config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useDispatch, useSelector} from 'react-redux';
 import Recaptcha from 'react-native-recaptcha-that-works';
+// import Icon from 'react-native-vector-icons/MaterialIcons';
+// import Recaptcha from 'react-native-recaptcha-that-works';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 //6LfkbEMgAAAAAIkc9Cd-pls5ZspaVywaGQfgG4Dl
 const validation = Yup.object().shape({
@@ -35,14 +37,14 @@ const Login = () => {
   const loginstate = useSelector(state => state.LoginReducer.isLoggedIn);
   const [toast, setToast] = useState('');
 
-  // const size = 'normal';
-  // const $recaptcha = useRef();
-  // const handleOpenPress = useCallback(() => {
-  //   $recaptcha.current.open();
-  // }, []);
-  // const handleClosePress = useCallback(() => {
-  //   $recaptcha.current.close();
-  // }, []);
+  const size = 'normal';
+  const $recaptcha = useRef();
+  const handleOpenPress = useCallback(() => {
+    $recaptcha.current.open();
+  }, []);
+  const handleClosePress = useCallback(() => {
+    $recaptcha.current.close();
+  }, []);
 
   return (
     <>
@@ -143,7 +145,7 @@ const Login = () => {
               </View>
               <Button
                 loading={isloading}
-                onPress={handleSubmit}
+                onPress={handleOpenPress}
                 disabled={isloading}
                 mode="contained"
                 style={styles.button}>
@@ -162,7 +164,7 @@ const Login = () => {
               Verify
             </Button> */}
 
-            {/* <Recaptcha
+            <Recaptcha
               ref={$recaptcha}
               lang="en"
               headerComponent={
@@ -194,7 +196,7 @@ const Login = () => {
               size={size}
               theme="light"
               onError={err => {
-                alert("SOMETHING WENT WRONG");
+                alert('SOMETHING WENT WRONG');
                 // console.warn(err);
               }}
               onExpire={() => alert('TOKEN EXPIRED')}
@@ -202,18 +204,17 @@ const Login = () => {
                 axios
                   .post(`${BASE_URL}/Auth/Recaptcha?token=${token}`)
                   .then(res => {
-                    if(res.data === true){
-                      alert('success');
-                    }else{
+                    if (res.data === true) {
+                      handleSubmit();
+                    } else {
                       alert('Verification failed');
                     }
                   })
                   .catch(err => {
                     console.log(err);
                   });
-                // console.log(token);
               }}
-            /> */}
+            />
           </View>
         )}
       </Formik>
