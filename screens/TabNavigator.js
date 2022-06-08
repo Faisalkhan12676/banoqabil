@@ -15,11 +15,13 @@ import AdmissionForm from './AdmissionForm';
 
 
 
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import AdminCard from './AdminCard';
 import { color } from '../components/Colors';
 import Education from './Education';
 import ExamScreen from './ExamScreen';
+import Exam from '../components/Exam';
 
 
 const tabs = createBottomTabNavigator();

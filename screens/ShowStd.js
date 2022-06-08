@@ -42,6 +42,7 @@ const ShowStd = () => {
 
   const [district, setDistrict] = useState([]);
   const [city, setCity] = useState([]);
+  const [id,setId] =  useState('');
 
   useEffect(() => {
     const getToken = async () => {
@@ -50,7 +51,8 @@ const ShowStd = () => {
         if (value !== null) {
           // We have data!!
           const data = JSON.parse(value);
-          console.log(data);
+          
+          console.log("TOKEN" + data);
           setToken(data.token);
         }
       } catch (error) {
@@ -98,9 +100,10 @@ const ShowStd = () => {
           })
           .then(res => {
             console.log('DATA : ', res.data);
-            const {student} = res.data;
+            const {student,user} = res.data;
 
             setData(student);
+            setId(user.id)
             console.log(student);
           })
           .catch(err => {
@@ -113,7 +116,23 @@ const ShowStd = () => {
     District();
     getCity();
     getstudent();
+    console.log(token);
   }, []);
+
+  const handleArea = value => {
+    console.log(value + 'ID');
+    axios
+      .get(`${BASE_URL}/Area/GetByCityId?id=${value}`, {
+        headers: {Authorization: `Bearer ${token}`},
+      })
+      .then(res => {
+        setDistrict(res.data);
+        // console.log(res.data);
+      })
+      .catch(err => {
+        console.log(err + 'FROM CITY POST');
+      });
+  };
 
   const ImageHandle = () => {
     const options = {
@@ -163,7 +182,7 @@ const ShowStd = () => {
 
   const today = new Date().toISOString().split('T')[0];
 
-  console.log(data);
+  console.log(id);
 
   return (
     <>
@@ -278,31 +297,35 @@ const ShowStd = () => {
                 presentAddress: '' || data.presentAddress,
                 cityId: '' || data.cityId,
                 whatsappNumber: '' || data.whatsappNumber,
-                otherNumber: '' || data.otherNumber,
+                // otherNumber: '' || data.otherNumber,
                 areaId: '' || data.areaId,
                 facebookAccount: '' || data.facebookAccount,
-                linkedinAccount: '' || data.linkedinAccount,
-                instagramAccount: '' || data.instagramAccount,
+                // linkedinAccount: '' || data.linkedinAccount,
+                // instagramAccount: '' || data.instagramAccount,
                 email: '' || data.email,
               }}
               onSubmit={(values, actions) => {
                 console.log({
-                  fatherName: values.fatherName,
-                  otherNumber: values.otherNumber,
-                  gender: values.gender,
-                  dob: values.dob,
-                  cnic: values.cnic,
-                  fatherOccupation: values.fatherOccupation,
-                  areaId: values.areaId,
-                  presentAddress: values.presentAddress,
-                  userId: 0,
-                  enrollmentDate: today,
-                  cityId: values.cityId,
-                  facebookAccount: values.facebookAccount,
-                  linkedinAccount: values.linkedinAccount,
-                  instagramAccount: values.instagramAccount,
-                  whatsappNumber: values.whatsappNumber,
-                  email: values.email,
+                           
+                            whatsappNumber: values.whatsappNumber, //
+                            email: values.email, //
+                            fatherName: values.fatherName, //
+                            whatsappNumber: values.whatsappNumber, //
+                            otherNumber: null, //
+                            facebookAccount: values.facebookAccount, //
+                            instagramAccount: null,
+                            linkedinAccount: null,
+                            presentAddress: values.presentAddress, //
+                            cnic: values.cnic, //
+                            enrollmentDate: today, //
+                            gender: values.gender, //
+                            cityId: values.cityId, //
+                            fatherOccupation: values.fatherOccupation, //
+                            dob: values.dob, //
+                            email: values.email, //
+                            "active": "string",
+                            userId: 0, //
+                            areaId: values.areaId, //
                 });
 
                 const postdata = async () => {
@@ -310,27 +333,36 @@ const ShowStd = () => {
                     const value = AsyncStorage.getItem('@userlogininfo');
                     if (value !== null) {
                       const data = JSON.parse(value);
+                      const {token } = data;
+                      console.log(token);
+                     
+
+                      
+                    
 
                       axios
                         .put(
-                          `${BASE_URL}/Student/Update`,
+                          `${BASE_URL}/Student/Update?id=${id}`,
                           {
-                            fatherName: values.fatherName, //
-                            otherNumber: values.otherNumber, //
-                            gender: values.gender, //
-                            dob: values.dob, //
-                            cnic: values.cnic, //
-                            fatherOccupation: values.fatherOccupation, //
-                            areaId: values.areaId, //
-                            presentAddress: values.presentAddress, //
-                            userId: 0, //
-                            enrollmentDate: today, //
-                            cityId: values.cityId, //
-                            facebookAccount: values.facebookAccount, //
-                            linkedinAccount: values.linkedinAccount, //
-                            instagramAccount: values.instagramAccount, //
                             whatsappNumber: values.whatsappNumber, //
                             email: values.email, //
+                            fatherName: values.fatherName, //
+                            whatsappNumber: values.whatsappNumber, //
+                            otherNumber: null, //
+                            facebookAccount: values.facebookAccount, //
+                            instagramAccount: null,
+                            linkedinAccount: null,
+                            presentAddress: values.presentAddress, //
+                            cnic: values.cnic, //
+                            enrollmentDate: today, //
+                            gender: values.gender, //
+                            cityId: values.cityId, //
+                            fatherOccupation: values.fatherOccupation, //
+                            dob: values.dob, //
+                            email: values.email, //
+                           
+                            userId: 0, //
+                            areaId: values.areaId, //
                           },
                           {
                             headers: {
@@ -410,7 +442,7 @@ const ShowStd = () => {
                         {touched.fatherName && errors.fatherName}
                       </HelperText>
 
-                      <TextInput
+                      {/* <TextInput
                         style={{marginHorizontal: 20}}
                         mode="flat"
                         placeholder="otherNumber"
@@ -424,7 +456,7 @@ const ShowStd = () => {
                         style={{marginHorizontal: 20}}
                         visible={touched.otherNumber && errors.otherNumber}>
                         {touched.otherNumber && errors.otherNumber}
-                      </HelperText>
+                      </HelperText> */}
                       <TouchableOpacity onPress={ImageHandle}>
                         <View
                           style={{
@@ -533,49 +565,62 @@ const ShowStd = () => {
                         }}
                       />
 
-                      <View>
-                        <Text
-                          style={{
-                            marginHorizontal: 20,
-                            fontSize: 18,
-                            color: '#000',
-                          }}>
-                          Area
-                        </Text>
-                        <RNPickerSelect
-                          onValueChange={(value, index) => {
-                            setFieldValue('areaId', value);
-                          }}
-                          placeholder={{
-                            label: 'Select Area',
-                            value: null,
-                          }}
-                          items={areaarr}
-                          value={values.areaId}
-                        />
-                      </View>
+<View>
+                      <Text
+                        style={{
+                          marginHorizontal: 20,
+                          fontSize: 18,
+                          color: '#000',
+                        }}>
+                        City
+                      </Text>
+                      <RNPickerSelect
+                        onValueChange={(value, index) => {
+                          setFieldValue('cityId', value);
+                          handleArea(value);
+                        }}
+                        placeholder={{
+                          label: 'Select City',
+                          value: null,
+                        }}
+                        items={cityarr}
+                        value={values.cityId}
+                      />
+                      <HelperText
+                        type="error"
+                        style={{marginHorizontal: 20}}
+                        visible={touched.cityId && errors.cityId}>
+                        {touched.cityId && errors.cityId}
+                      </HelperText>
+                    </View>
 
-                      <View>
-                        <Text
-                          style={{
-                            marginHorizontal: 20,
-                            fontSize: 18,
-                            color: '#000',
-                          }}>
-                          Area
-                        </Text>
-                        <RNPickerSelect
-                          onValueChange={(value, index) => {
-                            setFieldValue('cityId', value);
-                          }}
-                          placeholder={{
-                            label: 'Select City',
-                            value: null,
-                          }}
-                          items={cityarr}
-                          value={values.cityId}
-                        />
-                      </View>
+                    <View>
+                      <Text
+                        style={{
+                          marginHorizontal: 20,
+                          fontSize: 18,
+                          color: '#000',
+                        }}>
+                        Area
+                      </Text>
+                      <RNPickerSelect
+                        onValueChange={(value, index) => {
+                          setFieldValue('areaId', value);
+                        }}
+                        placeholder={{
+                          label: 'Select Area',
+                          value: null,
+                        }}
+                        items={areaarr}
+                        value={values.areaId}
+                      />
+                      <HelperText
+                        type="error"
+                        style={{marginHorizontal: 20}}
+                        visible={touched.areaId && errors.areaId}>
+                        {touched.areaId && errors.areaId}
+                      </HelperText>
+                    </View>
 
                       <TextInput
                         style={{marginHorizontal: 20, marginVertical: 10}}
@@ -665,7 +710,7 @@ const ShowStd = () => {
                         {touched.facebookAccount && errors.facebookAccount}
                       </HelperText>
 
-                      <TextInput
+                      {/* <TextInput
                         style={{marginHorizontal: 20, marginVertical: 10}}
                         mode="flat"
                         placeholder="Instagram Account"
@@ -681,9 +726,9 @@ const ShowStd = () => {
                           touched.instagramAccount && errors.instagramAccount
                         }>
                         {touched.instagramAccount && errors.instagramAccount}
-                      </HelperText>
+                      </HelperText> */}
 
-                      <TextInput
+                      {/* <TextInput
                         style={{marginHorizontal: 20, marginVertical: 10}}
                         mode="flat"
                         placeholder="LinkedIn Account"
@@ -699,7 +744,7 @@ const ShowStd = () => {
                           touched.linkedinAccount && errors.linkedinAccount
                         }>
                         {touched.linkedinAccount && errors.linkedinAccount}
-                      </HelperText>
+                      </HelperText> */}
 
                       {/* SUBMIT BUTTON */}
                       <Button

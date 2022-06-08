@@ -21,7 +21,7 @@ const ExamScreen = () => {
   const examquestionsfromapi = [
     {
       id: 1,
-      questionType: 'Radio',
+      questionType: 'Checkbox',
       question:
         'It was Sunday on Jan 1, 2006. What was the day of the week Jan 1, 2010?',
       options: [
@@ -291,13 +291,13 @@ const ExamScreen = () => {
       ],
     },
   ];
-  const [modalVisible, setModalVisible] = useState(false);
+  // const [modalVisible, setModalVisible] = useState(false);
   const [state, setState] = useState(examquestionsfromapi);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [backdisbaled, setBackDisabled] = useState(true);
   const [radiox, setRadiox] = useState(false);
 
-  console.log(state);
+  // console.log("STATE"+state);
 
   const finalarr = state.filter(item => {
     return item.options.filter(item => {
@@ -313,7 +313,7 @@ const ExamScreen = () => {
 
   return (
     <>
-      <View>
+      {/* <View>
         <Text
           style={{
             fontSize: 30,
@@ -341,57 +341,23 @@ const ExamScreen = () => {
         </Text>
           {/* radio group */}
           
-             {/* {state[currentQuestion].options.map((item,i) => {
-              return (
-                <View key={item.id}>
-                 <RadioButton.Group
-                  value={state[currentQuestion].options[i].isChecked}
-                  onValueChange={value => {
-                    setState(
-                      state.map(item => {
-                        if (item.id !== state[currentQuestion].id) {
-                          item.options[i].isChecked = value;
-                        }
-                        return item;
-                      }
-                      )
-                    );
-                  }
-                  }
-                  >
-                    <View style={{ flexDirection: 'row' }}>
-                      <RadioButton
-                        value={
-                          state[currentQuestion].options[i].isChecked}
-                        label={item.option1}
-                        labelStyle={{ fontSize: 18 }}
-                        status={
-                          state[currentQuestion].options[i].isChecked
-                            ? 'unchecked'
-                            : 'checked'
-                        }
-                      />
-                      <Text style={{ fontSize: 18, marginRight: 10 }}>
-                        {item.option1}
-                      </Text>
-                     
-                      </View>
-                  </RadioButton.Group>
-
-                </View>
-              );
-            }
-            )}  */}
+            
           
             
-            {state[currentQuestion].questionType === 'Radio' ? (
+            {/* {state[currentQuestion].questionType === 'Radio' ? (
               state[currentQuestion].options.map((item, i) => {
                 return (
                   <View key={item.id}>
                     <RadioButton.Group>
                         <View style={{ flexDirection: 'row' }}>
                           <RadioButton
-                           
+                            value={item.option1}
+                            status={item.isChecked ? 'checked' : 'unchecked'}
+                            onPress={() => {
+                              setRadiox(true);
+                              state[currentQuestion].options[i].isChecked = true;
+                              setState([...state]);
+                            }}
                           />
                           <Text style={{ fontSize: 18, marginRight: 10 }}>
                             {item.option1}
@@ -425,134 +391,97 @@ const ExamScreen = () => {
               );
             })}
               </>
-            )}
+            )} */}
+
+            
 
 
-      
-          
-
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginVertical: 20,
-          }}>
-          <Button
-            color={color.card}
-            disabled={currentQuestion === 0 ? true : false}
-            onPress={() => {
-              setCurrentQuestion(currentQuestion - 1);
-            }}>
-            Back
-          </Button>
-          {currentQuestion === state.length - 1 ? (
-            <>
-              <Button onPress={() => [setModalVisible(true)]}>Finish</Button>
-              <Modal
-                animationType="slide"
-                transparent={true}
-                visible={modalVisible}
-                onRequestClose={() => {
-                  Alert.alert('Modal has been closed.');
-                  setModalVisible(!modalVisible);
-                }}>
-                <View style={styles.centeredView}>
-                  <View style={styles.modalView}>
-                    <Icon
-                      name="checkmark-circle-outline"
-                      size={40}
-                      color={color.primary}
-                    />
-                    <Text style={styles.modalText}>
-                      Thank You. For Attempt Demo Exam
-                    </Text>
-                    <Button
-                      color={color.primary}
-                      onPress={() => {
-                        setModalVisible(!modalVisible);
-
-                        navigation.navigate('home');
-                      }}>
-                      Ok
-                    </Button>
-                  </View>
-                </View>
-              </Modal>
-            </>
-          ) : (
-            <>
-              <Button
-                color={color.card}
-                disabled={currentQuestion === state.length - 1 ? true : false}
-                onPress={() => {
-                  setCurrentQuestion(currentQuestion + 1);
-                }}>
-                Next
-              </Button>
-            </>
-          )}
-        </View>
-      </View>
-
-      {/* {state.map((item, index) => {
-        return (
-          <>
-            <View key={index}>
-              <Text>{item.question}</Text>
-              {item.questionType === 'Checkbox' ? (
-                <View>
-                  {item.options.map((opt, index) => {
+            {
+              state[currentQuestion].questionType === 'Checkbox' ? (
+                <>
+                  {state[currentQuestion].options.map((item, i) => {
                     return (
-                      <View key={index}>
+                      <View
+                        key={item.id}
+                        style={{
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          marginVertical: 5,
+                        }}>
                         <CheckBox
-                          value={opt.isChecked}
+                          value={item.isChecked}
                           onValueChange={() => {
-                            item.options[index].isChecked = !opt.isChecked;
-                            //change option value string to null
+                            item.isChecked = !item.isChecked;
                             setState([...state]);
-                          }}
+                          }
+                          }
                         />
-                        <Text>{opt.option1}</Text>
+                        <Text>{item.option1}</Text>
                       </View>
                     );
                   })}
-                </View>
-              ) : (
-                item.questionType === 'radio' && (
-                  <RadioButton.Group
-                    onValueChange={value => {
-                      item.options.map(opt => {
-                        if (opt.id === value) {
-                          opt.isChecked = true;
-                        } else {
-                          opt.isChecked = false;
-                        }
-                        return opt;
-                      });
-                      setState([...state]);
-                    }}
-                    //value id
-                    value={
-                      item.options.filter(opt => opt.isChecked === true)[0]
-                    }>
-                    {item.options.map((opt, index) => {
-                      return (
-                        <View key={index}>
-                          <RadioButton value={opt.id} color={color.primary} />
-                          <Text>{opt.option1}</Text>
-                        </View>
-                      );
-                    })}
-                  </RadioButton.Group>
-                )
-              )}
-            </View>
-          </>
-        );
-      })} */}
 
-      {/* <View
+                </>
+              ):(
+                <>
+                  {state[currentQuestion].options.map((item, i) => {
+                    return (
+                      <View
+                        key={item.id}
+                        style={{
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          marginVertical: 5,
+                        }}>
+                        <RadioButton.Group
+                          onValueChange={(e) => {
+                           //if option1 is checked then set all other options to false
+                            if(e === item.option1){
+                              state[currentQuestion].options.map((item, i) => {
+                                item.isChecked = false;
+                              });
+                              item.isChecked = true;
+                              setState([...state]);
+                            }
+
+                            
+                            
+                          }}>
+                        
+                          <View style={{ flexDirection: 'row' }}>
+                            <RadioButton.Item
+                              value={item.option1}
+                              status={item.isChecked ? 'checked' : 'unchecked'}
+                              />
+                            <Text style={{ fontSize: 18, marginRight: 10 }}>
+                              {item.option1}
+                            </Text>
+                            </View>
+                        </RadioButton.Group>
+                      </View>
+                    );
+                  })}
+
+                </>
+              )
+            }
+
+            <Button onPress={()=>{
+              setCurrentQuestion(currentQuestion+1);
+            }} >ADD</Button>
+             <Button onPress={()=>{
+              setCurrentQuestion(currentQuestion-1);
+            }} >BACK</Button>
+
+
+
+          
+
+       
+
+      
+
+      <View
         style={{
           height: 70,
           width: '100%',
@@ -681,10 +610,10 @@ const ExamScreen = () => {
           style={{
             backgroundColor: color.primary,
           }}
-          onPress={handleStart}>
+          >
           Start Exam
         </Button>
-      </View> */}
+      </View>
     </>
   );
 };

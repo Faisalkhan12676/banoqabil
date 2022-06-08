@@ -251,23 +251,7 @@ const StudentRegistration = () => {
             }}
             validationSchema={validation}
             onSubmit={async (values, {resetForm}) => {
-              console.log({
-                fatherName: values.fatherName,
-                // otherNumber: values.otherNumber,
-                gender: values.gender,
-                dob: values.dob,
-                cnic: values.cnic,
-                fatherOccupation: values.FatherOccupation,
-                areaId: values.areaId,
-                presentAddress: values.presentAddress,
-                userId: 0,
-                enrollmentDate: today,
-                cityId: values.cityId,
-                facebookAccount: values.facebookAccount,
-                linkedinAccount: null,
-                instagramAccount: null,
-                whatsappNumber: values.whatsappNumber,
-              });
+             
 
               axios
                 .post(
