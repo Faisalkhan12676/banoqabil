@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   BackHandler,
   KeyboardAvoidingView,
+
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {
@@ -33,12 +34,15 @@ import DatePicker from 'react-native-date-picker';
 import {color} from '../components/Colors';
 import {string} from 'yup';
 import {StackActions, useNavigation} from '@react-navigation/native';
+import AlertIcon from 'react-native-vector-icons/Ionicons';
 
 const Education = () => {
   const navigate = useNavigation();
   const [degree, setDegree] = useState([]);
   const [isloading2, setIsLoading2] = useState(true);
   const [token, setToken] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
+
 
   useEffect(() => {
     const getStdId = async () => {
@@ -176,9 +180,7 @@ const Education = () => {
                               )
                               .then(res => {
                                 console.log(res.data);
-                                navigate.dispatch(
-                                  StackActions.replace('TabNavigator'),
-                                );
+                                setModalVisible(true);
                               })
                               .catch(err => {
                                 console.log(err);
@@ -315,6 +317,44 @@ const Education = () => {
               </Formik>
             </ScrollView>
           </KeyboardAvoidingView>
+          <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => {
+                  Alert.alert('Modal has been closed.');
+                  setModalVisible(!modalVisible);
+                }}>
+                <View style={styles.centeredView}>
+                  <View style={styles.modalView}>
+                    <AlertIcon name='checkmark-circle-outline' size={40} color={color.primary} />
+                    <Text style={styles.modalText}>
+                      Registration Successful
+                    </Text>
+                    <Text
+                      style={{
+                        marginTop: 10,
+                        fontSize: 16,
+                        color: color.primary,
+                      }}>
+                      Thank You.
+                    </Text>
+                   <Button 
+                   color={color.primary}
+                   onPress={() => {
+                      setModalVisible(!modalVisible);
+                      if(modalVisible){
+                        navigate.dispatch(
+                          StackActions.replace('TabNavigator'),
+                        );
+                      }
+                   }}
+                   >
+                     Ok
+                   </Button>
+                  </View>
+                </View>
+              </Modal>
         </>
       )}
     </>
@@ -323,4 +363,46 @@ const Education = () => {
 
 export default Education;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 22
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 35,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5
+  },
+  button: {
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2
+  },
+  buttonOpen: {
+    backgroundColor: "#F194FF",
+  },
+  buttonClose: {
+    backgroundColor: "#2196F3",
+  },
+  textStyle: {
+    color: "white",
+    fontWeight: "bold",
+    textAlign: "center"
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: "center"
+  }
+});

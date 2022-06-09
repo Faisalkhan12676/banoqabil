@@ -1,4 +1,4 @@
-import {StyleSheet, Text, View, TouchableOpacity, Image,SafeAreaView} from 'react-native';
+import {StyleSheet, Text, View, TouchableOpacity, Image,SafeAreaView,Modal,Alert} from 'react-native';
 import React, {useState, useEffect,useRef,useCallback} from 'react';
 import {TextInput, HelperText,ActivityIndicator} from 'react-native-paper';
 import {Button} from 'react-native-paper';
@@ -12,6 +12,7 @@ import {BASE_URL} from '../config';
 import {useDispatch} from 'react-redux';
 import Recaptcha from 'react-native-recaptcha-that-works';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import AlertIcon from 'react-native-vector-icons/Ionicons';
 
 const validation = Yup.object().shape({
   name: Yup.string().required('Name is required'),
@@ -27,6 +28,7 @@ const validation = Yup.object().shape({
 
 
 const Register = () => {
+  const [modalVisible, setModalVisible] = useState(false);
   const [isloading, setIsLoading] = useState(false);
   const [eye, setEye] = useState(true);
   const navigate = useNavigation();
@@ -63,19 +65,18 @@ const Register = () => {
 
              
 
-              setIsLoading(true);
+              // setIsLoading(true);
               await axios
                 .post(`${BASE_URL}/Auth/register`, {
                   name,
                   username,
-                  number1,
+                  email: number1,
                   password,
                   role: null,
                 })
                 .then(res => {
                    //SMS WORK
                   
-
                   axios
                   .post(
                     `https://sms.montymobile.com/API/SendBulkSMS`,
@@ -104,11 +105,8 @@ const Register = () => {
                   try {
                     AsyncStorage.setItem('@userlogininfo', data);
                     console.log('data', data);
-                    dispatch({type: 'LOGIN'});
-                    if (loginstate) {
-                      navigate.navigate('str');
-                      
-                    }
+                   
+                    setModalVisible(true);
                     resetForm();
                   } catch (e) {
                     // saving error
@@ -188,7 +186,7 @@ const Register = () => {
                     onPress={handleOpenPress}
                     disabled={isloading}
                     mode="contained"
-                    style={styles.button}>
+                    style={styles.buttonr}>
                     Register
                   </Button>
                   <Recaptcha
@@ -252,11 +250,43 @@ const Register = () => {
                     </Text>
                   </TouchableOpacity>
                 </View>
+               
               </>
             )}
           </Formik>
         </View>
+      
+     
       </View>
+      <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => {
+                  Alert.alert('Modal has been closed.');
+                  setModalVisible(!modalVisible);
+                }}>
+                <View style={styles.centeredView}>
+                  <View style={styles.modalView}>
+                    <AlertIcon name='checkmark-circle-outline' size={40} color={color.primary} />
+                    <Text style={styles.modalText}>
+                      You Have Signed Up Successfully.
+                    </Text>
+                   <Button 
+                   color={color.primary}
+                   onPress={() => {
+                      setModalVisible(!modalVisible);
+                      if(modalVisible){
+                        dispatch({type: 'LOGIN'});
+                       
+                      }
+                   }}
+                   >
+                     Ok
+                   </Button>
+                  </View>
+                </View>
+              </Modal>
     </>
   );
 };
@@ -276,7 +306,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     padding: 0,
   },
-  button: {
+  buttonr: {
     width: 300,
     margin: 10,
     backgroundColor: color.primary,
@@ -295,4 +325,45 @@ const styles = StyleSheet.create({
   form: {
     marginBottom: 50,
   },
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 22
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 35,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5
+  },
+  button: {
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2
+  },
+  buttonOpen: {
+    backgroundColor: "#F194FF",
+  },
+  buttonClose: {
+    backgroundColor: "#2196F3",
+  },
+  textStyle: {
+    color: "white",
+    fontWeight: "bold",
+    textAlign: "center"
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: "center"
+  }
 });

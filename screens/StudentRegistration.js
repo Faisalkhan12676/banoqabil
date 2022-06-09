@@ -56,6 +56,7 @@ const StudentRegistration = () => {
   const [isImg, setIsImg] = useState(false);
   const [validateImg, setValidateImg] = useState(false);
   const [isbtn, setIsbtn] = useState(false);
+  const [loadArea, setLoadArea] = useState(false);
 
   // const size = 'normal';
   // const $recaptcha = useRef();
@@ -68,6 +69,7 @@ const StudentRegistration = () => {
 
   useEffect(() => {
     //GET USER ID FROM ASYNC STORAGE
+
     const getToken = async () => {
       try {
         const value = await AsyncStorage.getItem('@userlogininfo');
@@ -75,6 +77,7 @@ const StudentRegistration = () => {
           // We have data!!
           const data = JSON.parse(value);
           setToken(data.token);
+          console.log('TOKEN', data.token);
 
           const getStudent = async () => {
             await axios
@@ -82,13 +85,33 @@ const StudentRegistration = () => {
                 headers: {Authorization: `Bearer ${data.token}`},
               })
               .then(res => {
-                // console.log(res.data);
-                console.log(res.data + 'IM FROM STUDENT REGISTRATION');
+                //get status
+                console.log(res.data, 'IM FROM STUDENT REGISTRATION');
                 navigate.dispatch(StackActions.replace('edu'));
               })
               .catch(err => {
-                console.log(err + 'ERR');
-                setIsLoading(false);
+                console.log(err + 'ERROR FROM STUDENT');
+                if (err.response.status === 401) {
+                  AsyncStorage.removeItem('@userlogininfo')
+                    .then(() => {
+                      dispatch({type: 'LOGOUT'});
+                      Alert.alert('Session Expired', 'Please Login Again', [
+                        {
+                          text: 'OK',
+                          onPress: () => {
+                            AsyncStorage.clear();
+                            navigate.dispatch(StackActions.replace('login'));
+                          },
+                        },
+                      ]);
+                    })
+                    .catch(err => {
+                      console.log(err);
+                    });
+                } else if (err.response.status === 500) {
+                  setIsLoading(false);
+                  console.log('ERROR 500');
+                }
               });
           };
           getStudent();
@@ -100,7 +123,9 @@ const StudentRegistration = () => {
               })
               .then(res => {
                 // console.log(res.data);
+
                 setCity(res.data);
+                console.log(res.data + 'IM FROM CITY REGISTRATION');
               })
               .catch(err => {
                 console.log(err);
@@ -112,6 +137,7 @@ const StudentRegistration = () => {
         // Error retrieving data
       }
     };
+
     getToken();
   }, []);
 
@@ -150,11 +176,13 @@ const StudentRegistration = () => {
 
   const handleArea = value => {
     console.log(value + 'ID');
+    setLoadArea(true);
     axios
       .get(`${BASE_URL}/Area/GetByCityId?id=${value}`, {
         headers: {Authorization: `Bearer ${token}`},
       })
       .then(res => {
+        setLoadArea(false);
         setDistrict(res.data);
         // console.log(res.data);
       })
@@ -215,11 +243,9 @@ const StudentRegistration = () => {
   //   navigate.navigate('edu');
   // }
 
-
-
   const a = () => {
     handleOpenPress();
-  }
+  };
 
   return (
     <>
@@ -253,7 +279,6 @@ const StudentRegistration = () => {
             validationSchema={validation}
             onSubmit={async (values, {resetForm}) => {
               setIsbtn(true);
-             
 
               axios
                 .post(
@@ -283,31 +308,60 @@ const StudentRegistration = () => {
                   },
                 )
                 .then(res => {
-                  if(isImg){
+                  if (isImg) {
                     console.log('DATA POSTED');
                     navigate.navigate('edu');
                     setIsbtn(false);
-                    axios.post(
-                      `${BASE_URL}/Student/AddImage`,
-                      {
-                        image: image,
-                        ext: ext,
-                      },
-                      {
-                        headers: {
-                          Authorization: `Bearer ${token}`,
+                    axios
+                      .post(
+                        `${BASE_URL}/Student/AddImage`,
+                        {
+                          image: image,
+                          ext: ext,
                         },
-                      },
-                    ).then((res)=>{
-                     
-                    }).catch((err)=>{
-                      console.log(err);
-                    });
+                        {
+                          headers: {
+                            Authorization: `Bearer ${token}`,
+                          },
+                        },
+                      )
+                      .then(res => {})
+                      .catch(err => {
+                        console.log(err);
+                      });
                     resetForm();
-                  }else{
-                    console.log("ADD IMAGE FIRST");
+                  } else {
+                    console.log('ADD IMAGE FIRST');
                     setValidateImg(true);
                   }
+                  
+                  const sendEmail = async () => {
+                    //get token from async storage
+                    const token = await AsyncStorage.getItem('@userlogininfo');
+                    if(token !== null){
+                      const data = JSON.parse(token);
+                      console.log(data,"data TOKEN");
+                      
+                      console.log(token,"token");
+                      axios
+                      .post(`${BASE_URL}/Student/SendEmail`,{},{
+                        headers:{
+                          Authorization: `Bearer ${data.token}`,
+                        }
+                      })
+                      .then(res => {
+                        console.log("EMAIL SENT");
+                      })
+                      .catch(err => {
+                        console.log(err , "EMAIL NOT SENT");
+                        
+                      });
+                    }
+
+                  }
+                  sendEmail();
+
+                
                 })
                 .catch(err => {
                   console.log(err.response);
@@ -501,7 +555,7 @@ const StudentRegistration = () => {
                           justifyContent: 'center',
                           alignItems: 'center',
                           borderRadius: 4,
-                          borderColor:validateImg ? 'red' : '#eee',
+                          borderColor: validateImg ? 'red' : '#eee',
                           borderWidth: validateImg ? 2 : 0,
                         }}>
                         <Text
@@ -549,6 +603,13 @@ const StudentRegistration = () => {
                           color: '#000',
                         }}>
                         Area
+                        {loadArea ? (
+                          <>
+                            {/* <ActivityIndicator size={20} color={color.primary} /> */}
+                          </>
+                        ) : (
+                          ''
+                        )}
                       </Text>
                       <RNPickerSelect
                         onValueChange={(value, index) => {
@@ -560,6 +621,7 @@ const StudentRegistration = () => {
                         }}
                         items={areaarr}
                         value={values.areaId}
+                        disabled={loadArea}
                       />
                       <HelperText
                         type="error"
@@ -591,8 +653,6 @@ const StudentRegistration = () => {
                       visible={touched.cnic && errors.cnic}>
                       {touched.cnic && errors.cnic}
                     </HelperText>
-
-                   
 
                     <TextInput
                       style={{marginHorizontal: 20, marginVertical: 10}}
@@ -668,7 +728,7 @@ const StudentRegistration = () => {
 
                     <View>
                       <Button
-                      loading={isbtn}
+                        loading={isbtn}
                         disabled={isbtn}
                         mode="contained"
                         style={{
@@ -677,7 +737,6 @@ const StudentRegistration = () => {
                           marginVertical: 15,
                         }}
                         onPress={handleSubmit}>
-                          
                         Submit
                       </Button>
                       <View

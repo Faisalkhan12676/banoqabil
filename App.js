@@ -21,6 +21,10 @@ import Awards from './components/Awards';
 // import Fyp from './components/fyp';
 import ShortFilms from './components/ShortFilms';
 import Fyp from './components/Fyp';
+import ForgetScreen from './screens/ForgetScreen';
+import NewPassowrd from './screens/NewPassowrd';
+
+
 
 
 
@@ -104,6 +108,8 @@ const App = () => {
                 <>
                   <stack.Screen name="Register" component={Register} />
                   <stack.Screen name="Login" component={Login} />
+                  <stack.Screen name="ForgetScreen" component={ForgetScreen} />
+                  <stack.Screen name="NewPassword" component={NewPassowrd} />
                   {/* <stack.Screen name="TabNavigator" component={TabNavigator}/> */}
                 </>
               )}

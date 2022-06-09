@@ -1,6 +1,6 @@
 
 
-export const BASE_URL = 'https://banoqabilapi.azurewebsites.net/api';
+export const BASE_URL = 'http://192.168.1.136:6538/api';
 
 //https://192.168.8.105:7134/
 //http://192.168.0.110:5134/api
@@ -13,3 +13,4 @@ export const BASE_URL = 'https://banoqabilapi.azurewebsites.net/api';
 //VALID
 //https://banoqabilapi.azurewebsites.net //PRIMARY
 //https://banoqabil.azurewebsites.net  //SECONDARY
+//http://192.168.1.179:6538/api

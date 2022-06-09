@@ -140,9 +140,17 @@ const Login = () => {
                 visible={errors.password}>
                 {errors.password}
               </HelperText>
+              <TouchableOpacity onPress={()=>{
+                navigate.navigate('ForgetScreen')
+              }} style={{
+                marginLeft: 10
+              }}>
+                <Text>Forgot Your Password?</Text>
+              </TouchableOpacity>
               <View>
                 <Text style={{color: 'red', marginLeft: 10}}>{toast}</Text>
               </View>
+             
               <Button
                 loading={isloading}
                 onPress={handleOpenPress}

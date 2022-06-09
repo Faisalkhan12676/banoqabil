@@ -5,15 +5,24 @@ import Swiper from 'react-native-swiper';
 const Slider = () => {
   const img1 = require('../assets/Banners-01.jpg');
   const img2 = require('../assets/Banners-02.jpg');
+  const img3 = require('../assets/Banner-03.jpg');
+  const img4 = require('../assets/Banner-04.jpeg');
+  const img5 = require('../assets/Banner-05.jpg');
   
   return (
     <View style={{height: 200}} >
       <Swiper style={styles.wrapper} showsPagination={false} loop={true} autoplay={true}>
         <View style={styles.slide1}>
-          <Image source={img1} style={styles.image} />
+          <Image source={img3} style={styles.image} />
         </View>
         <View style={styles.slide2}>
-          <Image source={img2} style={styles.image} />
+          <Image source={img4} style={styles.image} />
+        </View>
+        <View style={styles.slide1}>
+          <Image source={img3} style={styles.image} />
+        </View>
+        <View style={styles.slide2}>
+          <Image source={img5} style={styles.image} />
         </View>
        
       </Swiper>

@@ -25,6 +25,8 @@ import AdmissionForm from './AdmissionForm';
 
 
 const Home = () => {
+  
+
   const navigation = useNavigation();
   const dispatch = useDispatch();
 
