@@ -22,7 +22,7 @@ import Recaptcha from 'react-native-recaptcha-that-works';
 // import Icon from 'react-native-vector-icons/MaterialIcons';
 // import Recaptcha from 'react-native-recaptcha-that-works';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-//6LfkbEMgAAAAAIkc9Cd-pls5ZspaVywaGQfgG4Dl
+//6LfkbEMgAAAAAIkc9Cd-pls5ZspaVywaGQfgG4Dl Captha API Key
 const validation = Yup.object().shape({
   username: Yup.string().required('Username is required'),
   password: Yup.string().required('Password is required'),
@@ -97,7 +97,7 @@ const Login = () => {
           <View style={styles.container}>
             <View style={styles.logo}>
               <Image
-                source={require('../assets/final_logo.jpeg')}
+                source={require('../assets/Bano-Qabil-Logo-Green.png')}
                 style={styles.img}
               />
             </View>
@@ -145,7 +145,7 @@ const Login = () => {
               }} style={{
                 marginLeft: 10
               }}>
-                <Text>Forgot Your Password?</Text>
+                <Text style={{color:'#000'}}>Forgot Your Password?</Text>
               </TouchableOpacity>
               <View>
                 <Text style={{color: 'red', marginLeft: 10}}>{toast}</Text>
@@ -168,9 +168,7 @@ const Login = () => {
                 Don't Have Account?
               </Text>
             </TouchableOpacity>
-            {/* <Button mode="outlined" onPress={handleOpenPress}>
-              Verify
-            </Button> */}
+            
 
             <Recaptcha
               ref={$recaptcha}
@@ -261,16 +259,4 @@ const styles = StyleSheet.create({
   },
 });
 
-// const getData = async () => {
-//   try {
-//     const value = await AsyncStorage.getItem('@userInfo');
-//     if (value !== null) {
-//       // value previously stored
-//       console.log(value);
-//       console.log("API LOGIN")
-//     }
-//   } catch (e) {
-//     // error reading value
-//   }
-// };
-// getData();
+

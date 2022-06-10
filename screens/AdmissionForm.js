@@ -106,23 +106,11 @@ const AdmissionForm = () => {
 
   const validation = Yup.object().shape({});
 
-  const [checked, setChecked] = useState(false);
-  const [checked2, setChecked2] = useState(false);
+
 
   return (
     <>
-      {/* {isChecked.map(e => (
-        <>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-            }}>
-            <CheckBox value={true} />
-            <Text>{e.name}</Text>
-          </View>
-        </>
-      ))} */}
+    
       {isloading ? (
         <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
           <ActivityIndicator animating={true} color={Colors.green400} />
@@ -494,35 +482,4 @@ const styles = StyleSheet.create({
   },
 });
 
-{
-  /* <CheckBox
-value={values.checked.some(
-  e => e.courseId === item.id,
-)}
-checked={values.checked.some(
-  e => e.courseId === item.id,
-)}
-onValueChange={() => {
-  //uncheck
-  if (
-    values.checked.some(e => e.courseId === item.id)
-  ) {
-    setFieldValue(
-      'checked',
-      values.checked.filter(
-        (e, i) => e.courseId !== item.id,
-      ),
-    );
-  } else {
-    //check
-    setFieldValue('checked', [
-      ...values.checked,
-      {
-        studentId: parseInt(stdID),
-        courseId: item.id,
-      },
-    ]);
-  }
-}}
-/> */
-}
+

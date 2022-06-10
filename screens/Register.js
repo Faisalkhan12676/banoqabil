@@ -49,7 +49,7 @@ const Register = () => {
         <View style={styles.form}>
           <View style={styles.logo}>
             <Image
-              source={require('../assets/final_logo.jpeg')}
+              source={require('../assets/Bano-Qabil-Logo-Green.png')}
               style={styles.img}
             />
           </View>

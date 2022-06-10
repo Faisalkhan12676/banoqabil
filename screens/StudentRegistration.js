@@ -561,6 +561,7 @@ const StudentRegistration = () => {
                         <Text
                           style={{
                             fontSize: 15,
+                            color: validateImg ? 'red' : '#000',
                           }}>
                           {imgplaceholder}
                         </Text>
